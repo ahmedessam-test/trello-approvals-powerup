@@ -6,43 +6,63 @@
 </head>
 <body>
 <script>
-  // Initialize as a proper power-up iframe — this gives us a real t object
-  var t = window.TrelloPowerUp.iframe({
-  appKey: 'd6dfdf9018fc698338d812f344d5c863',
-  appName: 'Approvals Injector'
-});
+  var isIframe = window.location.search.includes('section') || 
+                 window.location.hash.includes('secret') ||
+                 window.self !== window.top;
 
-  // Store globally
-  window.injectorT = t;
+  if (isIframe) {
+    // We are loaded as an iframe by Trello — we have a real secret
+    var t = window.TrelloPowerUp.iframe({
+      appKey: 'd6dfdf9018fc698338d812f344d5c863',
+      appName: 'Approvals Injector'
+    });
 
-  console.log('[Injector] Ready. t.set:', typeof t.set);
+    window.injectorT = t;
+    console.log('[Injector] Loaded as iframe. t.set:', typeof t.set);
 
-  // Signal to parent that we are ready
-  window.parent.postMessage({ type: 'INJECTOR_READY' }, '*');
+    // Tell parent we are ready with t
+    window.parent.postMessage({ type: 'INJECTOR_READY' }, '*');
 
-  // Listen for write commands from the parent page (Trello console)
-  window.addEventListener('message', async function(e) {
-    if (!e.data || e.data.type !== 'WRITE_APPROVAL') return;
+    // Listen for write commands
+    window.addEventListener('message', async function(e) {
+      if (!e.data || e.data.type !== 'WRITE_APPROVAL') return;
 
-    var cardId = e.data.cardId;
-    var approverIds = e.data.approverIds;
-    var minimumApprovals = e.data.minimumApprovals || 3;
+      console.log('[Injector] Writing to card:', e.data.cardId);
+      try {
+        await t.set(e.data.cardId, 'shared', 'approvalData', {
+          reviews: {},
+          idReviewers: e.data.approverIds,
+          minimumApprovals: e.data.minimumApprovals || 3
+        });
+        console.log('[Injector] SUCCESS:', e.data.cardId);
+        window.parent.postMessage({ type: 'WRITE_RESULT', cardId: e.data.cardId, success: true }, '*');
+      } catch(err) {
+        console.log('[Injector] FAILED:', e.data.cardId, err.message);
+        window.parent.postMessage({ type: 'WRITE_RESULT', cardId: e.data.cardId, success: false, error: err.message }, '*');
+      }
+    });
 
-    console.log('[Injector] Writing to card:', cardId, approverIds);
+  } else {
+    // We are the connector — register capabilities so Trello loads us on cards
+    window.TrelloPowerUp.initialize({
+      'card-back-section': function(t, options) {
+        return {
+          title: 'Approvals Injector',
+          icon: 'https://ahmedessam-test.github.io/trello-approvals-powerup/icon.png',
+          content: {
+            type: 'iframe',
+            url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/?section=true'),
+            height: 30
+          }
+        };
+      }
+    }, {
+      appKey: 'd6dfdf9018fc698338d812f344d5c863',
+      appName: 'Approvals Injector'
+    });
 
-    try {
-      await t.set(cardId, 'shared', 'approvalData', {
-        reviews: {},
-        idReviewers: approverIds,
-        minimumApprovals: minimumApprovals
-      });
-      console.log('[Injector] SUCCESS:', cardId);
-      window.parent.postMessage({ type: 'WRITE_RESULT', cardId: cardId, success: true }, '*');
-    } catch(err) {
-      console.log('[Injector] FAILED:', cardId, err.message);
-      window.parent.postMessage({ type: 'WRITE_RESULT', cardId: cardId, success: false, error: err.message }, '*');
-    }
-  });
+    console.log('[Injector] Registered as connector with card-back-section');
+  }
 </script>
 </body>
 </html>

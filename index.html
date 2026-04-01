@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+</head>
+<body>
+<script>
+  var APP_KEY = 'd6dfdf9018fc698338d812f344d5c863';
+  var BASE_URL = 'https://ahmedessam-test.github.io/trello-approvals-powerup';
+
+  var COLORS = {
+    approved: '#4bce97',
+    pending: '#f5cd47',
+    declined: '#f87168',
+    neutral: '#579dff'
+  };
+
+  window.TrelloPowerUp.initialize({
+
+    // ─── CARD BACK SECTION ───────────────────────────────────────────
+    'card-back-section': function(t, options) {
+      return t.card('id').then(function(card) {
+        return {
+          title: 'Approvals',
+          icon: BASE_URL + '/icon.svg',
+          content: {
+            type: 'iframe',
+            url: t.signUrl(BASE_URL + '/section.html'),
+            height: 230
+          }
+        };
+      });
+    },
+
+    // ─── CARD BADGES (front of card) ─────────────────────────────────
+    'card-badges': function(t, options) {
+      return t.get('card', 'shared', 'approvalData').then(function(data) {
+        if (!data || !data.idReviewers || data.idReviewers.length === 0) return [];
+
+        var total = data.idReviewers.length;
+        var reviews = data.reviews || {};
+        var approvedCount = Object.values(reviews).filter(function(r) { return r.status === 'approved'; }).length;
+        var declinedCount = Object.values(reviews).filter(function(r) { return r.status === 'declined'; }).length;
+
+        var color, text;
+        if (declinedCount > 0) {
+          color = 'red'; text = 'Declined';
+        } else if (approvedCount === total) {
+          color = 'green'; text = 'Approved';
+        } else {
+          color = 'yellow'; text = 'Pending (' + approvedCount + '/' + total + ')';
+        }
+
+        return [{
+          text: text,
+          color: color,
+          icon: BASE_URL + '/icon.svg'
+        }];
+      }).catch(function() { return []; });
+    },
+
+    // ─── CARD DETAIL BADGES (back of card header) ────────────────────
+    'card-detail-badges': function(t, options) {
+      return t.get('card', 'shared', 'approvalData').then(function(data) {
+        if (!data || !data.idReviewers || data.idReviewers.length === 0) return [];
+
+        var total = data.idReviewers.length;
+        var reviews = data.reviews || {};
+        var approvedCount = Object.values(reviews).filter(function(r) { return r.status === 'approved'; }).length;
+        var declinedCount = Object.values(reviews).filter(function(r) { return r.status === 'declined'; }).length;
+
+        var color, text;
+        if (declinedCount > 0) {
+          color = 'red'; text = 'Declined';
+        } else if (approvedCount === total) {
+          color = 'green'; text = 'Approved ✓';
+        } else {
+          color = 'yellow'; text = 'Pending (' + approvedCount + '/' + total + ')';
+        }
+
+        return [{
+          title: 'Approval Status',
+          text: text,
+          color: color
+        }];
+      }).catch(function() { return []; });
+    },
+
+    // ─── BOARD BUTTONS (dashboard) ───────────────────────────────────
+    'board-buttons': function(t, options) {
+      return [{
+        text: 'Approvals Dashboard',
+        icon: BASE_URL + '/icon.svg',
+        callback: function(t) {
+          return t.modal({
+            url: t.signUrl(BASE_URL + '/dashboard.html'),
+            title: 'Approvals Dashboard',
+            fullscreen: false,
+            height: 600
+          });
+        }
+      }];
+    }
+
+  }, {
+    appKey: APP_KEY,
+    appName: 'Change Approvals'
+  });
+</script>
+</body>
+</html>

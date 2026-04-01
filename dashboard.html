@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f4f5f7;
+      color: #172b4d;
+      font-size: 13px;
+      min-height: 100vh;
+    }
+    .header {
+      background: #0052cc;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header h1 { font-size: 18px; font-weight: 700; }
+    .header-stats { display: flex; gap: 16px; }
+    .stat {
+      text-align: center;
+      background: rgba(255,255,255,0.15);
+      padding: 6px 14px;
+      border-radius: 4px;
+    }
+    .stat-num { font-size: 20px; font-weight: 700; }
+    .stat-label { font-size: 10px; opacity: 0.8; text-transform: uppercase; }
+
+    .toolbar {
+      padding: 12px 20px;
+      display: flex;
+      gap: 8px;
+      background: #fff;
+      border-bottom: 1px solid #dfe1e6;
+    }
+    .filter-btn {
+      padding: 5px 12px;
+      border: 1px solid #dfe1e6;
+      border-radius: 3px;
+      background: #fff;
+      font-size: 12px;
+      cursor: pointer;
+      font-weight: 500;
+      color: #42526e;
+    }
+    .filter-btn.active {
+      background: #0052cc;
+      color: #fff;
+      border-color: #0052cc;
+    }
+
+    .content { padding: 16px 20px; }
+
+    .card-item {
+      background: #fff;
+      border-radius: 6px;
+      margin-bottom: 10px;
+      padding: 14px 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      cursor: pointer;
+      transition: box-shadow 0.15s;
+    }
+    .card-item:hover { box-shadow: 0 3px 8px rgba(0,0,0,0.12); }
+
+    .card-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      gap: 8px;
+    }
+    .card-name {
+      font-weight: 600;
+      font-size: 14px;
+      color: #172b4d;
+      flex: 1;
+    }
+    .status-badge {
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+    .badge-pending { background: #fffae6; color: #974f0c; }
+    .badge-approved { background: #dcfff1; color: #216e4e; }
+    .badge-declined { background: #ffeceb; color: #ae2e24; }
+    .badge-empty { background: #f4f5f7; color: #42526e; }
+
+    .approvers-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .approver-chip {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 3px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .chip-pending { background: #f4f5f7; color: #42526e; }
+    .chip-approved { background: #dcfff1; color: #216e4e; }
+    .chip-declined { background: #ffeceb; color: #ae2e24; }
+
+    .mini-avatar {
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #6b778c;
+    }
+    .empty {
+      text-align: center;
+      padding: 40px;
+      color: #6b778c;
+    }
+    .empty-icon { font-size: 40px; margin-bottom: 12px; }
+
+    /* Bulk inject section */
+    .bulk-section {
+      background: #fff;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+    }
+    .bulk-title {
+      font-size: 14px;
+      font-weight: 700;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+    }
+    .bulk-body { display: none; margin-top: 12px; }
+    .bulk-body.open { display: block; }
+    textarea {
+      width: 100%;
+      background: #f4f5f7;
+      border: 1px solid #dfe1e6;
+      border-radius: 4px;
+      font-family: monospace;
+      font-size: 11px;
+      padding: 8px;
+      min-height: 100px;
+      resize: vertical;
+      outline: none;
+      margin-bottom: 8px;
+    }
+    textarea:focus { border-color: #0052cc; }
+    .bulk-hint { font-size: 11px; color: #6b778c; margin-bottom: 8px; }
+    .run-btn {
+      padding: 7px 16px;
+      background: #0052cc;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .run-btn:hover { background: #0065ff; }
+    .run-btn:disabled { background: #97a0af; }
+    .bulk-log {
+      margin-top: 10px;
+      background: #172b4d;
+      border-radius: 4px;
+      padding: 10px;
+      font-family: monospace;
+      font-size: 11px;
+      line-height: 1.8;
+      max-height: 150px;
+      overflow-y: auto;
+      display: none;
+      color: #b6c2cf;
+    }
+    .bulk-log.open { display: block; }
+    .log-ok { color: #4bce97; }
+    .log-err { color: #f87168; }
+    .log-info { color: #8c9bad; }
+
+    .progress-bar { height: 4px; background: #dfe1e6; border-radius: 2px; margin-bottom: 8px; overflow: hidden; display: none; }
+    .progress-bar.open { display: block; }
+    .progress-fill { height: 100%; background: #0052cc; width: 0%; transition: width 0.3s; }
+  </style>
+</head>
+<body>
+
+<div class="header">
+  <h1>📋 Approvals Dashboard</h1>
+  <div class="header-stats">
+    <div class="stat">
+      <div class="stat-num" id="statTotal">—</div>
+      <div class="stat-label">Total</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statPending">—</div>
+      <div class="stat-label">Pending</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statApproved">—</div>
+      <div class="stat-label">Approved</div>
+    </div>
+    <div class="stat">
+      <div class="stat-num" id="statDeclined">—</div>
+      <div class="stat-label">Declined</div>
+    </div>
+  </div>
+</div>
+
+<div class="toolbar">
+  <button class="filter-btn active" onclick="setFilter('all', this)">All</button>
+  <button class="filter-btn" onclick="setFilter('pending', this)">Pending</button>
+  <button class="filter-btn" onclick="setFilter('approved', this)">Approved</button>
+  <button class="filter-btn" onclick="setFilter('declined', this)">Declined</button>
+  <button class="filter-btn" onclick="setFilter('empty', this)">No Approvers</button>
+</div>
+
+<div class="content">
+
+  <!-- Bulk Injector -->
+  <div class="bulk-section">
+    <div class="bulk-title" onclick="toggleBulk()">
+      <span>⚡</span> Bulk Set Approvers
+      <span id="bulkArrow" style="margin-left:auto;font-size:10px">▼</span>
+    </div>
+    <div class="bulk-body" id="bulkBody">
+      <p class="bulk-hint">One card per line: card_short_id, member_id_1, member_id_2, member_id_3</p>
+      <textarea id="bulkCsv" placeholder="MQ9AAcak,68871e9d8e385696213e6a11,646b127449ddc15f6f1da60e,60602b17b1be5e4d747aac3b"></textarea>
+      <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+      <button class="run-btn" id="runBtn" onclick="runBulk()">▶ Run Bulk Injection</button>
+      <div class="bulk-log" id="bulkLog"></div>
+    </div>
+  </div>
+
+  <div id="cardList"><div class="loading">Loading cards...</div></div>
+</div>
+
+<script>
+  var t = window.TrelloPowerUp.iframe({
+    appKey: 'd6dfdf9018fc698338d812f344d5c863',
+    appName: 'Change Approvals'
+  });
+
+  var AVATAR_COLORS = ['#0052cc','#00875a','#ff5630','#ff991f','#6554c0','#00b8d9','#36b37e','#ff7452'];
+  var allCards = [];
+  var memberMap = {};
+  var currentFilter = 'all';
+
+  function getInitials(name) {
+    return name.split(' ').map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+  }
+  function getColor(id) {
+    var h = 0;
+    for (var i = 0; i < id.length; i++) h = id.charCodeAt(i) + ((h << 5) - h);
+    return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+  }
+
+  function delay(ms) { return new Promise(function(r) { setTimeout(r, ms); }); }
+
+  async function init() {
+    var board = await t.board('members', 'cards');
+    board.members.forEach(function(m) { memberMap[m.id] = m; });
+
+    var cards = board.cards;
+    var results = [];
+
+    for (var i = 0; i < cards.length; i++) {
+      var card = cards[i];
+      try {
+        var data = await t.get(card.id, 'shared', 'approvalData');
+        results.push({ card: card, data: data });
+      } catch(e) {
+        results.push({ card: card, data: null });
+      }
+    }
+
+    allCards = results;
+    updateStats();
+    renderCards();
+  }
+
+  function getCardStatus(item) {
+    var data = item.data;
+    if (!data || !data.idReviewers || data.idReviewers.length === 0) return 'empty';
+    var reviews = data.reviews || {};
+    var total = data.idReviewers.length;
+    var approvedCount = Object.values(reviews).filter(function(r) { return r.status === 'approved'; }).length;
+    var declinedCount = Object.values(reviews).filter(function(r) { return r.status === 'declined'; }).length;
+    if (declinedCount > 0) return 'declined';
+    if (approvedCount === total) return 'approved';
+    return 'pending';
+  }
+
+  function updateStats() {
+    var withApprovers = allCards.filter(function(c) { return c.data && c.data.idReviewers && c.data.idReviewers.length > 0; });
+    var pending = withApprovers.filter(function(c) { return getCardStatus(c) === 'pending'; });
+    var approved = withApprovers.filter(function(c) { return getCardStatus(c) === 'approved'; });
+    var declined = withApprovers.filter(function(c) { return getCardStatus(c) === 'declined'; });
+
+    document.getElementById('statTotal').textContent = withApprovers.length;
+    document.getElementById('statPending').textContent = pending.length;
+    document.getElementById('statApproved').textContent = approved.length;
+    document.getElementById('statDeclined').textContent = declined.length;
+  }
+
+  function setFilter(filter, btn) {
+    currentFilter = filter;
+    document.querySelectorAll('.filter-btn').forEach(function(b) { b.classList.remove('active'); });
+    btn.classList.add('active');
+    renderCards();
+  }
+
+  function renderCards() {
+    var filtered = allCards.filter(function(item) {
+      if (currentFilter === 'all') return true;
+      return getCardStatus(item) === currentFilter;
+    });
+
+    if (filtered.length === 0) {
+      document.getElementById('cardList').innerHTML =
+        '<div class="empty"><div class="empty-icon">✓</div>No cards match this filter</div>';
+      return;
+    }
+
+    var html = '';
+    filtered.forEach(function(item) {
+      var card = item.card;
+      var data = item.data;
+      var status = getCardStatus(item);
+
+      var badgeClass = 'badge-' + status;
+      var badgeText = status === 'approved' ? '✓ Approved' :
+                      status === 'declined' ? '✕ Declined' :
+                      status === 'pending' ? 'Pending' : 'No Approvers';
+
+      var approvalsHtml = '';
+      if (data && data.idReviewers && data.idReviewers.length > 0) {
+        var reviews = data.reviews || {};
+        data.idReviewers.forEach(function(memberId) {
+          var member = memberMap[memberId] || { fullName: 'Unknown', username: 'unknown', id: memberId };
+          var review = reviews[memberId] || {};
+          var rStatus = review.status || 'pending';
+          var chipClass = 'chip-' + rStatus;
+          var icon = rStatus === 'approved' ? '✓ ' : rStatus === 'declined' ? '✕ ' : '';
+          approvalsHtml += '<div class="approver-chip ' + chipClass + '">' +
+            '<div class="mini-avatar" style="background:' + getColor(memberId) + '">' + getInitials(member.fullName) + '</div>' +
+            icon + member.fullName +
+            '</div>';
+        });
+      }
+
+      html += '<div class="card-item" onclick="openCard(\'' + card.shortLink + '\')">' +
+        '<div class="card-header">' +
+          '<div class="card-name">' + card.name + '</div>' +
+          '<span class="status-badge ' + badgeClass + '">' + badgeText + '</span>' +
+        '</div>' +
+        '<div class="approvers-row">' + (approvalsHtml || '<span style="color:#6b778c;font-size:11px">No approvers set</span>') + '</div>' +
+        '</div>';
+    });
+
+    document.getElementById('cardList').innerHTML = html;
+  }
+
+  function openCard(shortLink) {
+    t.navigate({ url: 'https://trello.com/c/' + shortLink });
+  }
+
+  function toggleBulk() {
+    var body = document.getElementById('bulkBody');
+    var arrow = document.getElementById('bulkArrow');
+    body.classList.toggle('open');
+    arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+  }
+
+  function bulkLog(msg, type) {
+    var log = document.getElementById('bulkLog');
+    log.classList.add('open');
+    var d = document.createElement('div');
+    d.className = 'log-' + (type || 'info');
+    d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+    log.appendChild(d);
+    log.scrollTop = log.scrollHeight;
+  }
+
+  function setProgress(done, total) {
+    var bar = document.getElementById('progressBar');
+    bar.classList.add('open');
+    document.getElementById('progressFill').style.width = Math.round((done/total)*100) + '%';
+  }
+
+  async function runBulk() {
+    var raw = document.getElementById('bulkCsv').value.trim();
+    if (!raw) { alert('Please enter CSV data'); return; }
+
+    var rows = raw.split('\n').map(function(l) { return l.trim(); })
+      .filter(function(l) { return l && !l.startsWith('#'); })
+      .map(function(l) {
+        var p = l.split(',').map(function(x) { return x.trim(); });
+        return { cardId: p[0], approverIds: p.slice(1).filter(Boolean) };
+      });
+
+    if (!rows.length) { alert('No valid rows'); return; }
+
+    var btn = document.getElementById('runBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Running...';
+
+    bulkLog('Starting — ' + rows.length + ' card(s)', 'info');
+    var ok = 0, fail = 0;
+
+    for (var i = 0; i < rows.length; i++) {
+      var row = rows[i];
+      setProgress(i, rows.length);
+      try {
+        await t.set(row.cardId, 'shared', 'approvalData', {
+          reviews: {},
+          idReviewers: row.approverIds,
+          minimumApprovals: row.approverIds.length
+        });
+        bulkLog('✓ ' + row.cardId, 'ok');
+        ok++;
+      } catch(e) {
+        bulkLog('✗ ' + row.cardId + ': ' + e.message, 'err');
+        fail++;
+      }
+      await delay(150);
+    }
+
+    setProgress(rows.length, rows.length);
+    bulkLog('Done — ' + ok + ' succeeded, ' + fail + ' failed', ok > 0 ? 'ok' : 'err');
+    btn.disabled = false;
+    btn.textContent = '▶ Run Bulk Injection';
+
+    // Reload
+    await delay(1000);
+    init();
+  }
+
+  init();
+</script>
+</body>
+</html>

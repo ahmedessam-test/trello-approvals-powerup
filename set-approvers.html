@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #fff;
+      color: #172b4d;
+      font-size: 13px;
+      padding: 8px;
+    }
+    .search-box {
+      width: 100%;
+      padding: 8px 10px;
+      border: 2px solid #dfe1e6;
+      border-radius: 4px;
+      font-size: 13px;
+      margin-bottom: 8px;
+      outline: none;
+    }
+    .search-box:focus { border-color: #0052cc; }
+    .member-list { max-height: 240px; overflow-y: auto; }
+    .member-row {
+      display: flex;
+      align-items: center;
+      padding: 6px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      gap: 8px;
+      transition: background 0.1s;
+    }
+    .member-row:hover { background: #f4f5f7; }
+    .member-row.selected { background: #e6f0ff; }
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+    }
+    .member-info { flex: 1; }
+    .member-name { font-weight: 600; font-size: 13px; }
+    .member-username { font-size: 11px; color: #6b778c; }
+    .checkmark { color: #0052cc; font-size: 16px; font-weight: 700; }
+    .save-btn {
+      width: 100%;
+      margin-top: 10px;
+      padding: 8px;
+      background: #0052cc;
+      color: #fff;
+      border: none;
+      border-radius: 4px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+    .save-btn:hover { background: #0065ff; }
+    .save-btn:disabled { background: #97a0af; cursor: not-allowed; }
+    .hint { font-size: 11px; color: #6b778c; margin-bottom: 8px; }
+  </style>
+</head>
+<body>
+<input class="search-box" id="search" placeholder="Search members..." oninput="filterMembers()" />
+<p class="hint" id="hint">Select approvers for this card</p>
+<div class="member-list" id="memberList">Loading...</div>
+<button class="save-btn" id="saveBtn" onclick="save()">Save Approvers</button>
+
+<script>
+  var t = window.TrelloPowerUp.iframe({
+    appKey: 'd6dfdf9018fc698338d812f344d5c863',
+    appName: 'Change Approvals'
+  });
+
+  var allMembers = [];
+  var selected = new Set();
+
+  var AVATAR_COLORS = ['#0052cc','#00875a','#ff5630','#ff991f','#6554c0','#00b8d9','#36b37e','#ff7452'];
+
+  function getInitials(name) {
+    return name.split(' ').map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+  }
+  function getColor(id) {
+    var h = 0;
+    for (var i = 0; i < id.length; i++) h = id.charCodeAt(i) + ((h << 5) - h);
+    return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+  }
+
+  async function init() {
+    var board = await t.board('members');
+    allMembers = board.members;
+
+    var data = await t.get('card', 'shared', 'approvalData');
+    if (data && data.idReviewers) {
+      data.idReviewers.forEach(function(id) { selected.add(id); });
+    }
+
+    renderMembers(allMembers);
+    updateHint();
+  }
+
+  function renderMembers(members) {
+    var html = '';
+    members.forEach(function(m) {
+      var isSelected = selected.has(m.id);
+      html += '<div class="member-row' + (isSelected ? ' selected' : '') + '" onclick="toggleMember(\'' + m.id + '\')" id="row-' + m.id + '">' +
+        '<div class="avatar" style="background:' + getColor(m.id) + '">' + getInitials(m.fullName) + '</div>' +
+        '<div class="member-info">' +
+          '<div class="member-name">' + m.fullName + '</div>' +
+          '<div class="member-username">@' + m.username + '</div>' +
+        '</div>' +
+        (isSelected ? '<span class="checkmark">✓</span>' : '') +
+        '</div>';
+    });
+    document.getElementById('memberList').innerHTML = html || '<div style="padding:8px;color:#6b778c">No members found</div>';
+  }
+
+  function toggleMember(id) {
+    if (selected.has(id)) {
+      selected.delete(id);
+    } else {
+      selected.add(id);
+    }
+    var query = document.getElementById('search').value.toLowerCase();
+    var filtered = allMembers.filter(function(m) {
+      return m.fullName.toLowerCase().includes(query) || m.username.toLowerCase().includes(query);
+    });
+    renderMembers(filtered);
+    updateHint();
+  }
+
+  function filterMembers() {
+    var query = document.getElementById('search').value.toLowerCase();
+    var filtered = allMembers.filter(function(m) {
+      return m.fullName.toLowerCase().includes(query) || m.username.toLowerCase().includes(query);
+    });
+    renderMembers(filtered);
+  }
+
+  function updateHint() {
+    var count = selected.size;
+    document.getElementById('hint').textContent = count === 0
+      ? 'Select approvers for this card'
+      : count + ' approver(s) selected';
+  }
+
+  async function save() {
+    var btn = document.getElementById('saveBtn');
+    btn.disabled = true;
+    btn.textContent = 'Saving...';
+    try {
+      var existing = await t.get('card', 'shared', 'approvalData') || {};
+      var existingReviews = existing.reviews || {};
+
+      // Keep existing reviews for approvers that are still selected
+      var newReviews = {};
+      selected.forEach(function(id) {
+        if (existingReviews[id]) newReviews[id] = existingReviews[id];
+      });
+
+      await t.set('card', 'shared', 'approvalData', {
+        reviews: newReviews,
+        idReviewers: Array.from(selected),
+        minimumApprovals: selected.size
+      });
+      await t.closePopup();
+    } catch(e) {
+      alert('Error saving: ' + e.message);
+      btn.disabled = false;
+      btn.textContent = 'Save Approvers';
+    }
+  }
+
+  init();
+</script>
+</body>
+</html>

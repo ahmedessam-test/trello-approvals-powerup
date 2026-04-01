@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: transparent;
+      color: #172b4d;
+      font-size: 13px;
+      padding: 8px 0;
+    }
+
+    .approvals-wrap { width: 100%; }
+
+    /* ── No approvers state ── */
+    .empty-state {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 6px 2px;
+    }
+    .empty-text { color: #6b778c; font-size: 12px; }
+
+    /* ── Approver row ── */
+    .approver-row {
+      display: flex;
+      align-items: center;
+      padding: 6px 2px;
+      border-bottom: 1px solid #f0f0f0;
+      gap: 8px;
+    }
+    .approver-row:last-child { border-bottom: none; }
+
+    .avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: 700;
+      color: #fff;
+      flex-shrink: 0;
+      position: relative;
+    }
+    .avatar-check {
+      position: absolute;
+      bottom: -2px;
+      right: -2px;
+      width: 14px;
+      height: 14px;
+      border-radius: 50%;
+      border: 2px solid #fff;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 8px;
+    }
+
+    .approver-info { flex: 1; min-width: 0; }
+    .approver-name {
+      font-weight: 600;
+      font-size: 13px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .approver-username { font-size: 11px; color: #6b778c; }
+
+    .status-tag {
+      font-size: 11px;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 3px;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .status-pending { color: #97770d; background: #fff8e1; }
+    .status-approved { color: #216e4e; background: #e6fcf5; }
+    .status-declined { color: #ae2e24; background: #fff0ee; }
+
+    .action-btns { display: flex; gap: 4px; }
+
+    .btn {
+      padding: 4px 10px;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: opacity 0.15s;
+    }
+    .btn:hover { opacity: 0.85; }
+    .btn-approve { background: #e6fcf5; color: #216e4e; }
+    .btn-decline { background: #fff0ee; color: #ae2e24; }
+    .btn-approved { background: #4bce97; color: #fff; }
+    .btn-declined { background: #f87168; color: #fff; }
+
+    .timestamp { font-size: 10px; color: #97a0af; white-space: nowrap; }
+
+    /* ── Summary bar ── */
+    .summary-bar {
+      margin-top: 8px;
+      padding: 8px 12px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      text-align: center;
+    }
+    .summary-pending { background: #fffae6; color: #974f0c; }
+    .summary-approved { background: #dcfff1; color: #216e4e; }
+    .summary-declined { background: #ffeceb; color: #ae2e24; }
+
+    /* ── Add approvers button ── */
+    .add-btn {
+      margin-top: 8px;
+      padding: 6px 10px;
+      background: #f4f5f7;
+      border: none;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #42526e;
+      cursor: pointer;
+      width: 100%;
+      text-align: left;
+      font-weight: 500;
+    }
+    .add-btn:hover { background: #ebecf0; }
+
+    .loading { color: #6b778c; font-size: 12px; padding: 8px 0; }
+    .error { color: #ae2e24; font-size: 12px; padding: 8px 0; }
+  </style>
+</head>
+<body>
+<div class="approvals-wrap" id="root">
+  <div class="loading">Loading approvals...</div>
+</div>
+
+<script>
+  var t = window.TrelloPowerUp.iframe({
+    appKey: 'd6dfdf9018fc698338d812f344d5c863',
+    appName: 'Change Approvals'
+  });
+
+  var AVATAR_COLORS = ['#0052cc','#00875a','#ff5630','#ff991f','#6554c0','#00b8d9','#36b37e','#ff7452'];
+
+  function getInitials(name) {
+    return name.split(' ').map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+  }
+
+  function getAvatarColor(id) {
+    var hash = 0;
+    for (var i = 0; i < id.length; i++) hash = id.charCodeAt(i) + ((hash << 5) - hash);
+    return AVATAR_COLORS[Math.abs(hash) % AVATAR_COLORS.length];
+  }
+
+  function formatDate(ts) {
+    if (!ts) return '';
+    return new Date(ts).toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+  }
+
+  async function loadAndRender() {
+    try {
+      var card = await t.card('id');
+      var members = await t.board('members');
+      var memberMap = {};
+      members.members.forEach(function(m) { memberMap[m.id] = m; });
+
+      var data = await t.get('card', 'shared', 'approvalData');
+      var currentMember = await t.member('id', 'fullName', 'username');
+
+      render(card.id, data, memberMap, currentMember);
+    } catch(e) {
+      document.getElementById('root').innerHTML = '<div class="error">Error loading approvals: ' + e.message + '</div>';
+    }
+  }
+
+  function render(cardId, data, memberMap, currentMember) {
+    var root = document.getElementById('root');
+
+    if (!data || !data.idReviewers || data.idReviewers.length === 0) {
+      root.innerHTML = '<div class="empty-state">' +
+        '<span class="empty-text">No approvers set for this card.</span>' +
+        '<button class="btn btn-approve" onclick="openSetApprovers()">+ Add Approvers</button>' +
+        '</div>';
+      t.sizeTo('#root');
+      return;
+    }
+
+    var reviews = data.reviews || {};
+    var total = data.idReviewers.length;
+    var approvedCount = Object.values(reviews).filter(function(r) { return r.status === 'approved'; }).length;
+    var declinedCount = Object.values(reviews).filter(function(r) { return r.status === 'declined'; }).length;
+    var isFullyApproved = approvedCount === total;
+    var isDeclined = declinedCount > 0;
+
+    var html = '';
+
+    data.idReviewers.forEach(function(memberId) {
+      var member = memberMap[memberId] || { fullName: 'Unknown', username: 'unknown', id: memberId };
+      var review = reviews[memberId] || {};
+      var status = review.status || 'pending';
+      var isCurrentUser = currentMember.id === memberId;
+      var initials = getInitials(member.fullName);
+      var color = getAvatarColor(memberId);
+
+      var checkIcon = '';
+      if (status === 'approved') checkIcon = '<div class="avatar-check" style="background:#4bce97">✓</div>';
+      if (status === 'declined') checkIcon = '<div class="avatar-check" style="background:#f87168">✕</div>';
+
+      var actionHtml = '';
+      if (isCurrentUser && status === 'pending') {
+        actionHtml = '<div class="action-btns">' +
+          '<button class="btn btn-approve" onclick="doApprove(\'' + memberId + '\')">✓ Approve</button>' +
+          '<button class="btn btn-decline" onclick="doDecline(\'' + memberId + '\')">✕ Decline</button>' +
+          '</div>';
+      } else if (status === 'approved') {
+        actionHtml = '<span class="status-tag status-approved">Approved</span>' +
+          '<span class="timestamp">' + formatDate(review.timestamp) + '</span>';
+      } else if (status === 'declined') {
+        actionHtml = '<span class="status-tag status-declined">Declined</span>' +
+          '<span class="timestamp">' + formatDate(review.timestamp) + '</span>';
+      } else {
+        actionHtml = '<span class="status-tag status-pending">Pending</span>';
+      }
+
+      html += '<div class="approver-row">' +
+        '<div class="avatar" style="background:' + color + '">' + initials + checkIcon + '</div>' +
+        '<div class="approver-info">' +
+          '<div class="approver-name">' + member.fullName + '</div>' +
+          '<div class="approver-username">@' + member.username + '</div>' +
+        '</div>' +
+        actionHtml +
+        '</div>';
+    });
+
+    // Summary bar
+    var summaryClass, summaryText;
+    if (isDeclined) {
+      summaryClass = 'summary-declined';
+      summaryText = '✕ Declined — ' + declinedCount + ' approver(s) declined';
+    } else if (isFullyApproved) {
+      summaryClass = 'summary-approved';
+      summaryText = '✓ Approved by all ' + total + ' approvers';
+    } else {
+      summaryClass = 'summary-pending';
+      summaryText = 'Pending — ' + approvedCount + ' of ' + total + ' approved';
+    }
+
+    html += '<div class="summary-bar ' + summaryClass + '">' + summaryText + '</div>';
+
+    // Add/change approvers button
+    html += '<button class="add-btn" onclick="openSetApprovers()">⚙ Change Approvers</button>';
+
+    root.innerHTML = html;
+    t.sizeTo('#root');
+
+    // Store for actions
+    window._cardId = cardId;
+    window._data = data;
+    window._memberMap = memberMap;
+    window._currentMember = currentMember;
+  }
+
+  async function doApprove(memberId) {
+    try {
+      var data = window._data;
+      var reviews = data.reviews || {};
+      reviews[memberId] = { status: 'approved', timestamp: Date.now() };
+      data.reviews = reviews;
+      await t.set('card', 'shared', 'approvalData', data);
+      window._data = data;
+      render(window._cardId, data, window._memberMap, window._currentMember);
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  }
+
+  async function doDecline(memberId) {
+    try {
+      var data = window._data;
+      var reviews = data.reviews || {};
+      reviews[memberId] = { status: 'declined', timestamp: Date.now() };
+      data.reviews = reviews;
+      await t.set('card', 'shared', 'approvalData', data);
+      window._data = data;
+      render(window._cardId, data, window._memberMap, window._currentMember);
+    } catch(e) {
+      alert('Error: ' + e.message);
+    }
+  }
+
+  async function openSetApprovers() {
+    await t.popup({
+      title: 'Set Approvers',
+      url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html'),
+      height: 400
+    });
+    loadAndRender();
+  }
+
+  // Also listen for bulk injection commands from console
+  window.addEventListener('message', async function(e) {
+    if (!e.data || e.data.type !== 'WRITE_APPROVAL') return;
+    try {
+      await t.set('card', 'shared', 'approvalData', {
+        reviews: {},
+        idReviewers: e.data.approverIds,
+        minimumApprovals: e.data.minimumApprovals || 3
+      });
+      window.parent.postMessage({ type: 'WRITE_RESULT', cardId: e.data.cardId, success: true }, '*');
+      loadAndRender();
+    } catch(err) {
+      window.parent.postMessage({ type: 'WRITE_RESULT', cardId: e.data.cardId, success: false, error: err.message }, '*');
+    }
+  });
+
+  window.parent.postMessage({ type: 'INJECTOR_READY' }, '*');
+
+  loadAndRender();
+</script>
+</body>
+</html>

@@ -280,13 +280,24 @@
   }
 
   async function openSet(e) {
-    await t.popup({
+    t.popup({
       title: 'Manage Approvers',
       url: 'https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html',
       height: 420,
       mouseEvent: e
     });
-    await reload();
+    // Poll for changes every second for 15 seconds after popup opens
+    var polls = 0;
+    var poller = setInterval(async function() {
+      polls++;
+      var fresh = await t.get("card","shared","approvalData");
+      var freshStr = JSON.stringify(fresh);
+      if (freshStr !== JSON.stringify(_data)) {
+        _data = fresh;
+        render();
+      }
+      if (polls >= 15) clearInterval(poller);
+    }, 1000);
   }
 
   // Bulk injection listener

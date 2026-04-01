@@ -24,9 +24,7 @@
       --blue-dim: rgba(87,157,255,0.12);
       --radius: 6px;
     }
-
     * { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
       font-family: 'DM Sans', sans-serif;
       background: transparent;
@@ -34,262 +32,104 @@
       font-size: 13px;
       padding: 4px 0 8px;
     }
-
-    /* ── Approver rows ── */
     .approver-list { display: flex; flex-direction: column; gap: 2px; }
-
     .approver-row {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: var(--radius);
-      transition: background 0.15s;
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 10px; border-radius: var(--radius); transition: background 0.15s;
     }
     .approver-row:hover { background: var(--surface2); }
-
-    /* Avatar */
     .av {
-      width: 34px;
-      height: 34px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 12px;
-      font-weight: 700;
-      color: #fff;
-      flex-shrink: 0;
-      position: relative;
-      letter-spacing: 0.02em;
+      width: 34px; height: 34px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700; color: #fff;
+      flex-shrink: 0; position: relative; letter-spacing: 0.02em;
     }
     .av-ring {
-      position: absolute;
-      inset: -2px;
-      border-radius: 50%;
+      position: absolute; inset: -2px; border-radius: 50%;
       border: 2px solid transparent;
     }
     .av-ring.approved { border-color: var(--green); }
     .av-ring.declined { border-color: var(--red); }
-
     .av-badge {
-      position: absolute;
-      bottom: -1px;
-      right: -1px;
-      width: 14px;
-      height: 14px;
-      border-radius: 50%;
+      position: absolute; bottom: -1px; right: -1px;
+      width: 14px; height: 14px; border-radius: 50%;
       border: 2px solid var(--bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 7px;
-      font-weight: 800;
-      color: #fff;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 800; color: #fff;
     }
     .av-badge.approved { background: var(--green); }
     .av-badge.declined { background: var(--red); }
-
-    /* Info */
     .av-info { flex: 1; min-width: 0; }
     .av-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-strong);
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+      font-size: 13px; font-weight: 600; color: var(--text-strong);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
-    .av-handle {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin-top: 1px;
-    }
-
-    /* Action area */
+    .av-handle { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
     .av-action { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
-
     .pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 3px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 3px 10px; border-radius: 20px;
+      font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase;
     }
     .pill.pending { background: var(--yellow-dim); color: var(--yellow); }
     .pill.approved { background: var(--green-dim); color: var(--green); }
     .pill.declined { background: var(--red-dim); color: var(--red); }
-
-    .ts {
-      font-size: 10px;
-      color: var(--text-muted);
-      white-space: nowrap;
-    }
-
-    /* Action buttons */
+    .ts { font-size: 10px; color: var(--text-muted); white-space: nowrap; }
     .btn-row { display: flex; gap: 4px; }
-
     .action-btn {
-      padding: 5px 11px;
-      border: none;
-      border-radius: 4px;
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+      padding: 5px 11px; border: none; border-radius: 4px;
+      font-size: 12px; font-weight: 600; cursor: pointer;
       font-family: 'DM Sans', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
-      position: relative;
-      overflow: hidden;
+      display: flex; align-items: center; gap: 5px; transition: opacity 0.15s;
     }
-    .action-btn::after {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: rgba(255,255,255,0);
-      transition: background 0.15s;
-    }
-    .action-btn:hover::after { background: rgba(255,255,255,0.08); }
-
-    .btn-approve {
-      background: var(--green-dim);
-      color: var(--green);
-      border: 1px solid rgba(75,206,151,0.25);
-    }
-    .btn-decline {
-      background: var(--red-dim);
-      color: var(--red);
-      border: 1px solid rgba(248,113,104,0.25);
-    }
-
-    /* Divider */
-    .divider {
-      height: 1px;
-      background: var(--border);
-      margin: 4px 10px;
-      opacity: 0.5;
-    }
-
-    /* Summary */
+    .action-btn:hover { opacity: 0.8; }
+    .btn-approve { background: var(--green-dim); color: var(--green); border: 1px solid rgba(75,206,151,0.25); }
+    .btn-decline { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,104,0.25); }
+    .divider { height: 1px; background: var(--border); margin: 4px 10px; opacity: 0.5; }
     .summary {
-      margin: 8px 10px 4px;
-      padding: 10px 14px;
-      border-radius: var(--radius);
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 12px;
-      font-weight: 600;
+      margin: 8px 10px 4px; padding: 10px 14px; border-radius: var(--radius);
+      display: flex; align-items: center; gap: 10px; font-size: 12px; font-weight: 600;
     }
     .summary.pending { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(245,205,71,0.2); }
     .summary.approved { background: var(--green-dim); color: var(--green); border: 1px solid rgba(75,206,151,0.2); }
     .summary.declined { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,104,0.2); }
-
     .summary-icon { font-size: 16px; }
     .summary-text { flex: 1; }
-    .summary-count { font-size: 18px; font-weight: 700; }
-
-    /* Progress dots */
     .progress-dots { display: flex; gap: 4px; margin-left: auto; }
-    .dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 50%;
-      background: rgba(255,255,255,0.1);
-    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,0.1); }
     .dot.approved { background: var(--green); }
     .dot.declined { background: var(--red); }
     .dot.pending { background: rgba(255,255,255,0.15); }
-
-    /* Footer actions */
-    .footer {
-      margin: 6px 10px 0;
-      display: flex;
-      gap: 6px;
-    }
-
+    .footer { margin: 6px 10px 0; display: flex; gap: 6px; }
     .footer-btn {
-      flex: 1;
-      padding: 7px 12px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      font-size: 12px;
-      font-weight: 600;
-      color: var(--text);
-      cursor: pointer;
+      flex: 1; padding: 7px 12px;
+      background: var(--surface2); border: 1px solid var(--border); border-radius: var(--radius);
+      font-size: 12px; font-weight: 600; color: var(--text); cursor: pointer;
       font-family: 'DM Sans', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      transition: all 0.15s;
+      display: flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.15s;
     }
-    .footer-btn:hover {
-      background: var(--border);
-      color: var(--text-strong);
-      border-color: transparent;
-    }
-    .footer-btn.danger:hover { background: var(--red-dim); color: var(--red); border-color: rgba(248,113,104,0.3); }
-
-    /* Empty state */
-    .empty {
-      padding: 16px 12px;
-      text-align: center;
-    }
+    .footer-btn:hover { background: var(--border); color: var(--text-strong); }
+    .empty { padding: 16px 12px; text-align: center; }
     .empty-icon {
-      width: 40px;
-      height: 40px;
-      background: var(--surface2);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      margin: 0 auto 10px;
-      font-size: 18px;
+      width: 40px; height: 40px; background: var(--surface2); border-radius: 50%;
+      display: flex; align-items: center; justify-content: center; margin: 0 auto 10px; font-size: 18px;
     }
     .empty-title { font-size: 13px; font-weight: 600; color: var(--text-strong); margin-bottom: 4px; }
     .empty-sub { font-size: 11px; color: var(--text-muted); margin-bottom: 12px; }
     .empty-btn {
-      padding: 7px 16px;
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius);
-      font-size: 12px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      transition: opacity 0.15s;
+      padding: 7px 16px; background: var(--blue); color: #fff; border: none;
+      border-radius: var(--radius); font-size: 12px; font-weight: 700; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; transition: opacity 0.15s;
     }
     .empty-btn:hover { opacity: 0.85; }
-
     .loading { padding: 16px 12px; color: var(--text-muted); font-size: 12px; }
-
-    /* Spin animation */
     @keyframes spin { to { transform: rotate(360deg); } }
     .spinner {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      border: 2px solid var(--border);
-      border-top-color: var(--blue);
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      margin-right: 6px;
+      display: inline-block; width: 12px; height: 12px;
+      border: 2px solid var(--border); border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.7s linear infinite; margin-right: 6px;
     }
-
-    /* Fade in */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(4px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
     .approver-row { animation: fadeUp 0.2s ease both; }
     .approver-row:nth-child(1) { animation-delay: 0.03s; }
     .approver-row:nth-child(2) { animation-delay: 0.06s; }
@@ -309,7 +149,7 @@
   var _data, _memberMap, _currentMember, _cardId;
 
   function initials(name) {
-    return (name || '??').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
+    return (name||'??').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
   }
   function color(id) {
     var h=0; for(var i=0;i<id.length;i++) h=id.charCodeAt(i)+((h<<5)-h);
@@ -335,6 +175,11 @@
     }
   }
 
+  async function reload() {
+    _data = await t.get('card','shared','approvalData');
+    render();
+  }
+
   function render() {
     var root = document.getElementById('root');
 
@@ -351,14 +196,11 @@
 
     var reviews = _data.reviews || {};
     var total = _data.idReviewers.length;
-    var approvedList = _data.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='approved'; });
-    var declinedList = _data.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='declined'; });
-    var approvedCount = approvedList.length;
-    var declinedCount = declinedList.length;
+    var approvedCount = _data.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='approved'; }).length;
+    var declinedCount = _data.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='declined'; }).length;
     var fullyApproved = approvedCount === total;
     var declined = declinedCount > 0;
 
-    // Build rows
     var rowsHtml = '';
     _data.idReviewers.forEach(function(id) {
       var m = _memberMap[id] || {fullName:'Unknown',username:'unknown',id:id};
@@ -370,69 +212,45 @@
       if (status==='approved') badgeHtml = '<div class="av-badge approved">✓</div>';
       if (status==='declined') badgeHtml = '<div class="av-badge declined">✕</div>';
 
-      var ringClass = status !== 'pending' ? ' class="av-ring '+status+'"' : '';
-
       var actionHtml = '';
       if (isMe && status==='pending') {
         actionHtml = '<div class="btn-row">'+
           '<button class="action-btn btn-approve" onclick="doAction(\''+id+'\',\'approved\')">'+
-            '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-            'Approve'+
-          '</button>'+
+            '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Approve</button>'+
           '<button class="action-btn btn-decline" onclick="doAction(\''+id+'\',\'declined\')">'+
-            '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'+
-            'Decline'+
-          '</button>'+
+            '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>Decline</button>'+
         '</div>';
       } else if (status==='approved') {
-        actionHtml = '<span class="pill approved">'+
-          '<svg width="9" height="9" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
-          'Approved</span>'+
-          '<span class="ts">'+fmtDate(review.timestamp)+'</span>';
+        actionHtml = '<span class="pill approved"><svg width="9" height="9" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>Approved</span><span class="ts">'+fmtDate(review.timestamp)+'</span>';
       } else if (status==='declined') {
-        actionHtml = '<span class="pill declined">'+
-          '<svg width="9" height="9" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>'+
-          'Declined</span>'+
-          '<span class="ts">'+fmtDate(review.timestamp)+'</span>';
+        actionHtml = '<span class="pill declined"><svg width="9" height="9" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg>Declined</span><span class="ts">'+fmtDate(review.timestamp)+'</span>';
       } else {
-        actionHtml = '<span class="pill pending">'+
-          '<svg width="8" height="8" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="2" fill="none"/></svg>'+
-          'Pending</span>';
+        actionHtml = '<span class="pill pending"><svg width="8" height="8" viewBox="0 0 12 12"><circle cx="6" cy="6" r="4" stroke="currentColor" stroke-width="2" fill="none"/></svg>Pending</span>';
       }
 
       rowsHtml += '<div class="approver-row">'+
         '<div class="av" style="background:'+color(id)+'">'+
           initials(m.fullName)+
-          '<div'+(status!=='pending'?' class="av-ring '+status+'"':' class="av-ring"')+'></div>'+
+          '<div class="av-ring'+(status!=='pending'?' '+status:'')+'"></div>'+
           badgeHtml+
         '</div>'+
-        '<div class="av-info">'+
-          '<div class="av-name">'+m.fullName+'</div>'+
-          '<div class="av-handle">@'+m.username+'</div>'+
-        '</div>'+
+        '<div class="av-info"><div class="av-name">'+m.fullName+'</div><div class="av-handle">@'+m.username+'</div></div>'+
         '<div class="av-action">'+actionHtml+'</div>'+
       '</div>';
     });
 
-    // Summary
     var summaryClass, summaryIcon, summaryText;
     var dotsHtml = _data.idReviewers.map(function(id){
       var s = reviews[id] ? reviews[id].status : 'pending';
       return '<div class="dot '+s+'"></div>';
     }).join('');
 
-    if (declined) {
-      summaryClass='declined'; summaryIcon='✕';
-      summaryText = declinedCount+' approver'+(declinedCount>1?'s':'')+' declined';
-    } else if (fullyApproved) {
-      summaryClass='approved'; summaryIcon='✓';
-      summaryText = 'Approved by all '+total+' approvers';
-    } else {
-      summaryClass='pending'; summaryIcon='◎';
-      summaryText = approvedCount+' of '+total+' approved';
-    }
+    if (declined) { summaryClass='declined'; summaryIcon='✕'; summaryText=declinedCount+' approver'+(declinedCount>1?'s':'')+' declined'; }
+    else if (fullyApproved) { summaryClass='approved'; summaryIcon='✓'; summaryText='Approved by all '+total+' approvers'; }
+    else { summaryClass='pending'; summaryIcon='◎'; summaryText=approvedCount+' of '+total+' approved'; }
 
-    var html = '<div class="approver-list">'+rowsHtml+'</div>'+
+    root.innerHTML =
+      '<div class="approver-list">'+rowsHtml+'</div>'+
       '<div class="divider"></div>'+
       '<div class="summary '+summaryClass+'">'+
         '<span class="summary-icon">'+summaryIcon+'</span>'+
@@ -446,13 +264,12 @@
         '</button>'+
       '</div>';
 
-    root.innerHTML = html;
     t.sizeTo('#root');
   }
 
   async function doAction(memberId, status) {
     try {
-      var data = _data;
+      var data = JSON.parse(JSON.stringify(_data));
       var reviews = data.reviews || {};
       reviews[memberId] = { status: status, timestamp: Date.now() };
       data.reviews = reviews;
@@ -469,8 +286,8 @@
       height: 420,
       mouseEvent: e
     });
-    _data = await t.get('card','shared','approvalData');
-    render();
+    // Bug 1 fix: live reload after popup closes
+    await reload();
   }
 
   // Bulk injection listener
@@ -478,13 +295,10 @@
     if (!e.data || e.data.type !== 'WRITE_APPROVAL') return;
     try {
       await t.set('card','shared','approvalData',{
-        reviews:{},
-        idReviewers: e.data.approverIds,
-        minimumApprovals: e.data.minimumApprovals||3
+        reviews:{}, idReviewers: e.data.approverIds, minimumApprovals: e.data.minimumApprovals||3
       });
       window.parent.postMessage({type:'WRITE_RESULT',cardId:e.data.cardId,success:true},'*');
-      _data = await t.get('card','shared','approvalData');
-      render();
+      await reload();
     } catch(err) {
       window.parent.postMessage({type:'WRITE_RESULT',cardId:e.data.cardId,success:false,error:err.message},'*');
     }

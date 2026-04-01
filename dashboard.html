@@ -519,18 +519,22 @@
       board.members.forEach(function(m){ memberMap[m.id]=m; });
       var cards = board.cards;
       allCards = [];
+      // Fetch plugin data for each card with small delay to avoid rate limiting
       for (var i=0; i<cards.length; i++) {
         try {
           var data = await t.get(cards[i].id,'shared','approvalData');
-          allCards.push({card:cards[i], data:data});
+          // t.get returns undefined if no data — treat as null
+          allCards.push({card:cards[i], data: data || null});
         } catch(e) {
           allCards.push({card:cards[i], data:null});
         }
+        // Small delay every 10 cards to avoid hitting limits
+        if (i > 0 && i % 10 === 0) await delay(100);
       }
       updateStats();
       renderCards();
     } catch(e) {
-      document.getElementById('cardGrid').innerHTML = '<div class="loading">Error: '+e.message+'</div>';
+      document.getElementById('cardGrid').innerHTML = '<div class="loading">Error loading: '+e.message+'</div>';
     }
   }
 

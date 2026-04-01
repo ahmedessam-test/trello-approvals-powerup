@@ -280,12 +280,13 @@
   }
 
   async function openSet(e) {
-    return t.overlay({
+    await t.popup({
+      title: 'Manage Approvers',
       url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html'),
-      args: {}
-    }).then(function() {
-      return reload();
+      height: 420,
+      mouseEvent: e
     });
+    await reload();
   }
 
   // Bulk injection listener

@@ -280,12 +280,12 @@
   }
 
   async function openSet(e) {
-    await t.popup({
-      title: 'Manage Approvers',
+    await t.overlay({
       url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html'),
-      height: 420,
-      mouseEvent: e
+      args: {}
     });
+    await reload();
+  }
     // Bug 1 fix: live reload after popup closes
     await reload();
   }

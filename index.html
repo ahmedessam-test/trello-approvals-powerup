@@ -6,63 +6,24 @@
 </head>
 <body>
 <script>
-  var isIframe = window.location.search.includes('section') || 
-                 window.location.hash.includes('secret') ||
-                 window.self !== window.top;
+  window.TrelloPowerUp.initialize({
+    'card-back-section': function(t, options) {
+      return {
+        title: 'Approvals Injector',
+        icon: 'https://cdn.glitch.com/1b42d7fe-bda8-4af8-a6c8-eff0cea9e08a%2Frocket.svg',
+        content: {
+          type: 'iframe',
+          url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/section.html'),
+          height: 50
+        }
+      };
+    }
+  }, {
+    appKey: 'd6dfdf9018fc698338d812f344d5c863',
+    appName: 'Approvals Injector'
+  });
 
-  if (isIframe) {
-    // We are loaded as an iframe by Trello — we have a real secret
-    var t = window.TrelloPowerUp.iframe({
-      appKey: 'd6dfdf9018fc698338d812f344d5c863',
-      appName: 'Approvals Injector'
-    });
-
-    window.injectorT = t;
-    console.log('[Injector] Loaded as iframe. t.set:', typeof t.set);
-
-    // Tell parent we are ready with t
-    window.parent.postMessage({ type: 'INJECTOR_READY' }, '*');
-
-    // Listen for write commands
-    window.addEventListener('message', async function(e) {
-      if (!e.data || e.data.type !== 'WRITE_APPROVAL') return;
-
-      console.log('[Injector] Writing to card:', e.data.cardId);
-      try {
-        await t.set(e.data.cardId, 'shared', 'approvalData', {
-          reviews: {},
-          idReviewers: e.data.approverIds,
-          minimumApprovals: e.data.minimumApprovals || 3
-        });
-        console.log('[Injector] SUCCESS:', e.data.cardId);
-        window.parent.postMessage({ type: 'WRITE_RESULT', cardId: e.data.cardId, success: true }, '*');
-      } catch(err) {
-        console.log('[Injector] FAILED:', e.data.cardId, err.message);
-        window.parent.postMessage({ type: 'WRITE_RESULT', cardId: e.data.cardId, success: false, error: err.message }, '*');
-      }
-    });
-
-  } else {
-    // We are the connector — register capabilities so Trello loads us on cards
-    window.TrelloPowerUp.initialize({
-      'card-back-section': function(t, options) {
-        return {
-          title: 'Approvals Injector',
-          icon: 'https://ahmedessam-test.github.io/trello-approvals-powerup/icon.png',
-          content: {
-            type: 'iframe',
-            url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/?section=true'),
-            height: 30
-          }
-        };
-      }
-    }, {
-      appKey: 'd6dfdf9018fc698338d812f344d5c863',
-      appName: 'Approvals Injector'
-    });
-
-    console.log('[Injector] Registered as connector with card-back-section');
-  }
+  console.log('[Connector] Registered card-back-section');
 </script>
 </body>
 </html>

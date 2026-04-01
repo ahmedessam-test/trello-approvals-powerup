@@ -2,41 +2,99 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8"/>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
   <style>
+    :root {
+      --bg: #1d2125;
+      --surface: #282e33;
+      --surface2: #2c333a;
+      --border: #3b4554;
+      --text: #b6c2cf;
+      --text-strong: #e8edf2;
+      --text-muted: #7c8da3;
+      --green: #4bce97;
+      --green-dim: rgba(75,206,151,0.12);
+      --red: #f87168;
+      --red-dim: rgba(248,113,104,0.12);
+      --blue: #579dff;
+      --blue-dim: rgba(87,157,255,0.12);
+      --radius: 6px;
+    }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-      background: #fff;
-      color: #172b4d;
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
       font-size: 13px;
-      padding: 8px;
+      padding: 12px;
     }
-    .search-box {
+
+    .search-wrap {
+      position: relative;
+      margin-bottom: 10px;
+    }
+    .search-icon {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .search-input {
       width: 100%;
-      padding: 8px 10px;
-      border: 2px solid #dfe1e6;
-      border-radius: 4px;
+      padding: 8px 10px 8px 32px;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      color: var(--text-strong);
       font-size: 13px;
-      margin-bottom: 8px;
+      font-family: 'DM Sans', sans-serif;
       outline: none;
+      transition: border-color 0.15s;
     }
-    .search-box:focus { border-color: #0052cc; }
-    .member-list { max-height: 240px; overflow-y: auto; }
+    .search-input:focus { border-color: var(--blue); }
+    .search-input::placeholder { color: var(--text-muted); }
+
+    .hint {
+      font-size: 11px;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .hint-count {
+      font-weight: 700;
+      color: var(--blue);
+    }
+
+    .member-list {
+      max-height: 260px;
+      overflow-y: auto;
+      margin: 0 -4px;
+    }
+    .member-list::-webkit-scrollbar { width: 4px; }
+    .member-list::-webkit-scrollbar-track { background: transparent; }
+    .member-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
     .member-row {
       display: flex;
       align-items: center;
-      padding: 6px 8px;
-      border-radius: 4px;
+      padding: 7px 8px;
+      border-radius: var(--radius);
       cursor: pointer;
-      gap: 8px;
+      gap: 10px;
       transition: background 0.1s;
+      user-select: none;
     }
-    .member-row:hover { background: #f4f5f7; }
-    .member-row.selected { background: #e6f0ff; }
-    .avatar {
-      width: 32px;
-      height: 32px;
+    .member-row:hover { background: var(--surface2); }
+    .member-row.selected { background: var(--blue-dim); }
+
+    .av {
+      width: 34px;
+      height: 34px;
       border-radius: 50%;
       display: flex;
       align-items: center;
@@ -45,33 +103,120 @@
       font-weight: 700;
       color: #fff;
       flex-shrink: 0;
+      letter-spacing: 0.02em;
     }
-    .member-info { flex: 1; }
-    .member-name { font-weight: 600; font-size: 13px; }
-    .member-username { font-size: 11px; color: #6b778c; }
-    .checkmark { color: #0052cc; font-size: 16px; font-weight: 700; }
-    .save-btn {
-      width: 100%;
-      margin-top: 10px;
-      padding: 8px;
-      background: #0052cc;
+
+    .member-info { flex: 1; min-width: 0; }
+    .member-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-strong);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .member-handle { font-size: 11px; color: var(--text-muted); margin-top: 1px; }
+
+    .check-box {
+      width: 18px;
+      height: 18px;
+      border-radius: 4px;
+      border: 1.5px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      transition: all 0.15s;
+    }
+    .member-row.selected .check-box {
+      background: var(--blue);
+      border-color: var(--blue);
+    }
+    .check-icon { display: none; color: #fff; font-size: 11px; font-weight: 800; }
+    .member-row.selected .check-icon { display: block; }
+
+    .divider { height: 1px; background: var(--border); margin: 10px 0; opacity: 0.5; }
+
+    /* Warning if has reviews */
+    .warn-box {
+      background: rgba(245,205,71,0.1);
+      border: 1px solid rgba(245,205,71,0.25);
+      border-radius: var(--radius);
+      padding: 8px 12px;
+      font-size: 11px;
+      color: #f5cd47;
+      margin-bottom: 10px;
+      display: none;
+    }
+
+    .actions { display: flex; gap: 8px; margin-top: 10px; }
+
+    .btn-save {
+      flex: 1;
+      padding: 9px;
+      background: var(--blue);
       color: #fff;
       border: none;
-      border-radius: 4px;
+      border-radius: var(--radius);
       font-size: 13px;
       font-weight: 700;
       cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: opacity 0.15s;
     }
-    .save-btn:hover { background: #0065ff; }
-    .save-btn:disabled { background: #97a0af; cursor: not-allowed; }
-    .hint { font-size: 11px; color: #6b778c; margin-bottom: 8px; }
+    .btn-save:hover { opacity: 0.85; }
+    .btn-save:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    .btn-clear {
+      padding: 9px 14px;
+      background: var(--red-dim);
+      color: var(--red);
+      border: 1px solid rgba(248,113,104,0.25);
+      border-radius: var(--radius);
+      font-size: 12px;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'DM Sans', sans-serif;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .btn-clear:hover { background: rgba(248,113,104,0.2); }
+
+    .empty-search { padding: 20px; text-align: center; color: var(--text-muted); font-size: 12px; }
   </style>
 </head>
 <body>
-<input class="search-box" id="search" placeholder="Search members..." oninput="filterMembers()" />
-<p class="hint" id="hint">Select approvers for this card</p>
-<div class="member-list" id="memberList">Loading...</div>
-<button class="save-btn" id="saveBtn" onclick="save()">Save Approvers</button>
+
+<div class="search-wrap">
+  <svg class="search-icon" width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/>
+    <path d="M11 11l3 3" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </svg>
+  <input class="search-input" id="search" placeholder="Search board members…" oninput="filter()"/>
+</div>
+
+<div class="hint">
+  <span id="hintText">Select approvers</span>
+  <span class="hint-count" id="hintCount"></span>
+</div>
+
+<div class="warn-box" id="warnBox">
+  ⚠ Changing approvers will reset existing approval decisions.
+</div>
+
+<div class="member-list" id="memberList">Loading…</div>
+
+<div class="divider"></div>
+
+<div class="actions">
+  <button class="btn-clear" onclick="clearAll()" title="Remove all approvers">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
+      <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+    </svg>
+    Remove All
+  </button>
+  <button class="btn-save" id="saveBtn" onclick="save()">Save Approvers</button>
+</div>
 
 <script>
   var t = window.TrelloPowerUp.iframe({
@@ -79,100 +224,105 @@
     appName: 'Change Approvals'
   });
 
+  var COLORS = ['#0747a6','#006644','#ae2e24','#974f0c','#5e4db2','#026e8f','#206a83','#a54800'];
   var allMembers = [];
   var selected = new Set();
+  var hadReviews = false;
 
-  var AVATAR_COLORS = ['#0052cc','#00875a','#ff5630','#ff991f','#6554c0','#00b8d9','#36b37e','#ff7452'];
-
-  function getInitials(name) {
-    return name.split(' ').map(function(w) { return w[0]; }).join('').slice(0, 2).toUpperCase();
+  function initials(name) {
+    return (name||'??').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
   }
-  function getColor(id) {
-    var h = 0;
-    for (var i = 0; i < id.length; i++) h = id.charCodeAt(i) + ((h << 5) - h);
-    return AVATAR_COLORS[Math.abs(h) % AVATAR_COLORS.length];
+  function avatarColor(id) {
+    var h=0; for(var i=0;i<id.length;i++) h=id.charCodeAt(i)+((h<<5)-h);
+    return COLORS[Math.abs(h)%COLORS.length];
   }
 
   async function init() {
     var board = await t.board('members');
     allMembers = board.members;
 
-    var data = await t.get('card', 'shared', 'approvalData');
+    var data = await t.get('card','shared','approvalData');
     if (data && data.idReviewers) {
-      data.idReviewers.forEach(function(id) { selected.add(id); });
+      data.idReviewers.forEach(function(id){ selected.add(id); });
+      var reviews = data.reviews || {};
+      hadReviews = Object.keys(reviews).length > 0;
     }
 
-    renderMembers(allMembers);
+    renderList(allMembers);
     updateHint();
   }
 
-  function renderMembers(members) {
+  function renderList(members) {
+    if (!members.length) {
+      document.getElementById('memberList').innerHTML = '<div class="empty-search">No members found</div>';
+      return;
+    }
     var html = '';
     members.forEach(function(m) {
-      var isSelected = selected.has(m.id);
-      html += '<div class="member-row' + (isSelected ? ' selected' : '') + '" onclick="toggleMember(\'' + m.id + '\')" id="row-' + m.id + '">' +
-        '<div class="avatar" style="background:' + getColor(m.id) + '">' + getInitials(m.fullName) + '</div>' +
-        '<div class="member-info">' +
-          '<div class="member-name">' + m.fullName + '</div>' +
-          '<div class="member-username">@' + m.username + '</div>' +
-        '</div>' +
-        (isSelected ? '<span class="checkmark">✓</span>' : '') +
-        '</div>';
+      var sel = selected.has(m.id);
+      html += '<div class="member-row'+(sel?' selected':'')+'" onclick="toggle(\''+m.id+'\')">'+
+        '<div class="av" style="background:'+avatarColor(m.id)+'">'+initials(m.fullName)+'</div>'+
+        '<div class="member-info">'+
+          '<div class="member-name">'+m.fullName+'</div>'+
+          '<div class="member-handle">@'+m.username+'</div>'+
+        '</div>'+
+        '<div class="check-box"><span class="check-icon">✓</span></div>'+
+      '</div>';
     });
-    document.getElementById('memberList').innerHTML = html || '<div style="padding:8px;color:#6b778c">No members found</div>';
+    document.getElementById('memberList').innerHTML = html;
   }
 
-  function toggleMember(id) {
-    if (selected.has(id)) {
-      selected.delete(id);
-    } else {
-      selected.add(id);
-    }
-    var query = document.getElementById('search').value.toLowerCase();
-    var filtered = allMembers.filter(function(m) {
-      return m.fullName.toLowerCase().includes(query) || m.username.toLowerCase().includes(query);
-    });
-    renderMembers(filtered);
+  function toggle(id) {
+    if (selected.has(id)) selected.delete(id);
+    else selected.add(id);
+    filter();
     updateHint();
+    checkWarn();
   }
 
-  function filterMembers() {
-    var query = document.getElementById('search').value.toLowerCase();
-    var filtered = allMembers.filter(function(m) {
-      return m.fullName.toLowerCase().includes(query) || m.username.toLowerCase().includes(query);
+  function filter() {
+    var q = document.getElementById('search').value.toLowerCase();
+    var filtered = allMembers.filter(function(m){
+      return m.fullName.toLowerCase().includes(q) || m.username.toLowerCase().includes(q);
     });
-    renderMembers(filtered);
+    renderList(filtered);
   }
 
   function updateHint() {
     var count = selected.size;
-    document.getElementById('hint').textContent = count === 0
-      ? 'Select approvers for this card'
-      : count + ' approver(s) selected';
+    document.getElementById('hintText').textContent = count===0 ? 'Select approvers for this card' : count+' approver'+(count>1?'s':'')+' selected';
+    document.getElementById('hintCount').textContent = count > 0 ? count+' selected' : '';
+  }
+
+  function checkWarn() {
+    document.getElementById('warnBox').style.display = hadReviews && selected.size > 0 ? 'block' : 'none';
+  }
+
+  function clearAll() {
+    if (!confirm('Remove all approvers and reset all approvals on this card?')) return;
+    selected.clear();
+    filter();
+    updateHint();
+    checkWarn();
   }
 
   async function save() {
     var btn = document.getElementById('saveBtn');
     btn.disabled = true;
-    btn.textContent = 'Saving...';
+    btn.textContent = 'Saving…';
     try {
-      var existing = await t.get('card', 'shared', 'approvalData') || {};
-      var existingReviews = existing.reviews || {};
-
-      // Keep existing reviews for approvers that are still selected
-      var newReviews = {};
-      selected.forEach(function(id) {
-        if (existingReviews[id]) newReviews[id] = existingReviews[id];
-      });
-
-      await t.set('card', 'shared', 'approvalData', {
-        reviews: newReviews,
-        idReviewers: Array.from(selected),
-        minimumApprovals: selected.size
-      });
+      if (selected.size === 0) {
+        await t.remove('card','shared','approvalData');
+      } else {
+        await t.set('card','shared','approvalData',{
+          reviews: {},
+          idReviewers: Array.from(selected),
+          minimumApprovals: selected.size
+        });
+      }
       await t.closePopup();
     } catch(e) {
-      alert('Error saving: ' + e.message);
+      alert('Error: '+e.message);
       btn.disabled = false;
       btn.textContent = 'Save Approvers';
     }

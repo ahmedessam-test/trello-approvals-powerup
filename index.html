@@ -8,8 +8,6 @@
 <script>
   var APP_KEY = 'd6dfdf9018fc698338d812f344d5c863';
   var BASE_URL = 'https://ahmedessam-test.github.io/trello-approvals-powerup';
-  var BASE_URL + '/icon.svg' = 'https://cdn.jsdelivr.net/npm/heroicons@1.0.6/outline/check-circle.svg';
-
   window.TrelloPowerUp.initialize({
 
     // ─── CARD BACK SECTION ───────────────────────────────────────────
@@ -42,21 +40,21 @@
 
         var color, text;
         if (declinedCount > 0) {
-          color = 'red'; text = '✕ Declined';
+          color = 'red'; text = 'Declined';
         } else if (approvedCount === total) {
-          color = 'green'; text = '✓ Approved';
+          color = 'green'; text = 'Approved';
         } else {
           var myReview = reviews[member.id];
           var iAmReviewer = data.idReviewers.indexOf(member.id) !== -1;
           var iNeedToApprove = iAmReviewer && (!myReview || myReview.status === 'pending');
           if (iNeedToApprove) {
-            color = 'yellow'; text = '● Pending your approval';
+            color = 'yellow'; text = 'Pending your approval';
           } else {
-            color = 'yellow'; text = '○ Pending (' + approvedCount + '/' + total + ')';
+            color = 'yellow'; text = 'Pending (' + approvedCount + '/' + total + ')';
           }
         }
 
-        return [{ text: text, color: color }];
+        return [{ text: text, color: color, icon: BASE_URL + '/icon.svg' }];
       }).catch(function() { return []; });
     },
 
@@ -77,17 +75,17 @@
 
         var color, text;
         if (declinedCount > 0) {
-          color = 'red'; text = '✕ Declined';
+          color = 'red'; text = 'Declined';
         } else if (approvedCount === total) {
-          color = 'green'; text = '✓ Approved';
+          color = 'green'; text = 'Approved';
         } else {
           var myReview = reviews[member.id];
           var iAmReviewer = data.idReviewers.indexOf(member.id) !== -1;
           var iNeedToApprove = iAmReviewer && (!myReview || myReview.status === 'pending');
           if (iNeedToApprove) {
-            color = 'yellow'; text = '● Pending your approval';
+            color = 'yellow'; text = 'Pending your approval';
           } else {
-            color = 'yellow'; text = '○ Pending (' + approvedCount + '/' + total + ')';
+            color = 'yellow'; text = 'Pending (' + approvedCount + '/' + total + ')';
           }
         }
 

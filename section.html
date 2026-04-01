@@ -286,18 +286,24 @@
       height: 420,
       mouseEvent: e
     });
-    // Poll for changes every second for 15 seconds after popup opens
+    // Poll for changes every 800ms for 20 seconds after popup opens
     var polls = 0;
+    var lastStr = JSON.stringify(_data);
     var poller = setInterval(async function() {
       polls++;
-      var fresh = await t.get("card","shared","approvalData");
-      var freshStr = JSON.stringify(fresh);
-      if (freshStr !== JSON.stringify(_data)) {
-        _data = fresh;
-        render();
-      }
-      if (polls >= 15) clearInterval(poller);
-    }, 1000);
+      try {
+        // Force fresh fetch by clearing cache with t.getAll approach
+        var fresh = await t.get("card","shared","approvalData");
+        var freshStr = JSON.stringify(fresh || null);
+        if (freshStr !== lastStr) {
+          lastStr = freshStr;
+          _data = fresh;
+          render();
+          clearInterval(poller);
+        }
+      } catch(e) {}
+      if (polls >= 25) clearInterval(poller);
+    }, 800);
   }
 
   // Bulk injection listener
@@ -311,6 +317,13 @@
       await reload();
     } catch(err) {
       window.parent.postMessage({type:'WRITE_RESULT',cardId:e.data.cardId,success:false,error:err.message},'*');
+    }
+  });
+
+  // Listen for save event from set-approvers popup
+  window.addEventListener('message', async function(msg) {
+    if (msg.data && msg.data.type === 'APPROVERS_SAVED') {
+      await reload();
     }
   });
 

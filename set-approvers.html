@@ -320,6 +320,8 @@
           minimumApprovals: selected.size
         });
       }
+      // Notify parent section to reload
+      window.parent.postMessage({ type: 'APPROVERS_SAVED' }, '*');
       await t.closePopup();
     } catch(e) {
       alert('Error: '+e.message);

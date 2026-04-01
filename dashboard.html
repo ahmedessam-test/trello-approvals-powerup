@@ -515,9 +515,9 @@
   async function init() {
     document.getElementById('cardGrid').innerHTML = '<div class="loading">Loading cards…</div>';
     try {
-      var board = await t.board('members','cards');
+      var board = await t.board('members');
       board.members.forEach(function(m){ memberMap[m.id]=m; });
-      var cards = board.cards;
+      var cards = await t.cards('id','name','shortLink');
       allCards = [];
       // Fetch plugin data for each card with small delay to avoid rate limiting
       for (var i=0; i<cards.length; i++) {

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <style>
+    body { margin: 0; padding: 8px; font-family: sans-serif; font-size: 12px; background: #1d2125; color: #b6c2cf; }
+    #status { padding: 4px; }
+    .ok { color: #4bce97; }
+    .err { color: #f87168; }
+  </style>
+</head>
+<body>
+<div id="status">Injector ready.</div>
+<script>
+  var t = window.TrelloPowerUp.iframe({
+    appKey: 'd6dfdf9018fc698338d812f344d5c863',
+    appName: 'Approvals Injector'
+  });
+
+  window.injectorT = t;
+
+  console.log('[Section] Loaded with card context. t.set:', typeof t.set);
+
+  // Tell parent we are ready
+  window.parent.postMessage({ type: 'INJECTOR_READY' }, '*');
+
+  // Listen for write commands
+  window.addEventListener('message', async function(e) {
+    if (!e.data || e.data.type !== 'WRITE_APPROVAL') return;
+
+    var cardId = e.data.cardId;
+    var approverIds = e.data.approverIds;
+    var minimumApprovals = e.data.minimumApprovals || 3;
+
+    document.getElementById('status').textContent = 'Writing to ' + cardId + '...';
+    console.log('[Section] Writing to card:', cardId);
+
+    try {
+      await t.set(cardId, 'shared', 'approvalData', {
+        reviews: {},
+        idReviewers: approverIds,
+        minimumApprovals: minimumApprovals
+      });
+      document.getElementById('status').className = 'ok';
+      document.getElementById('status').textContent = '✓ Done: ' + cardId;
+      console.log('[Section] SUCCESS:', cardId);
+      window.parent.postMessage({ type: 'WRITE_RESULT', cardId: cardId, success: true }, '*');
+    } catch(err) {
+      document.getElementById('status').className = 'err';
+      document.getElementById('status').textContent = '✗ Failed: ' + err.message;
+      console.log('[Section] FAILED:', cardId, err.message);
+      window.parent.postMessage({ type: 'WRITE_RESULT', cardId: cardId, success: false, error: err.message }, '*');
+    }
+  });
+</script>
+</body>
+</html>

@@ -1,193 +1,26 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Approvals Injector</title>
+  <meta charset="UTF-8">
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
-  <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      font-family: 'Segoe UI', sans-serif;
-      background: #1d2125;
-      color: #b6c2cf;
-      padding: 16px;
-    }
-    h2 { color: #fff; font-size: 15px; margin-bottom: 4px; }
-    .subtitle { font-size: 11px; color: #8c9bad; margin-bottom: 16px; }
-    label {
-      display: block;
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: #8c9bad;
-      margin-bottom: 5px;
-    }
-    textarea {
-      width: 100%;
-      background: #111417;
-      border: 1px solid #3b4554;
-      border-radius: 4px;
-      color: #b6c2cf;
-      font-family: monospace;
-      font-size: 11px;
-      padding: 8px;
-      min-height: 140px;
-      resize: vertical;
-      outline: none;
-    }
-    textarea:focus { border-color: #579dff; }
-    .hint { font-size: 11px; color: #596573; margin-top: 4px; margin-bottom: 14px; }
-    button {
-      width: 100%;
-      padding: 10px;
-      background: #579dff;
-      color: #1d2125;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-    }
-    button:hover { background: #85b8ff; }
-    button:disabled { opacity: 0.5; cursor: not-allowed; }
-    .log-box {
-      margin-top: 12px;
-      background: #111417;
-      border-radius: 6px;
-      padding: 10px;
-      font-family: monospace;
-      font-size: 11px;
-      line-height: 1.8;
-      max-height: 200px;
-      overflow-y: auto;
-      display: none;
-    }
-    .log-box.visible { display: block; }
-    .ok   { color: #4bce97; }
-    .err  { color: #f87168; }
-    .info { color: #8c9bad; }
-    .warn { color: #f5cd47; }
-    .progress { height: 4px; background: #1d2125; border-radius: 3px; margin-top: 8px; overflow: hidden; display: none; }
-    .progress.visible { display: block; }
-    .progress-fill { height: 100%; background: #579dff; width: 0%; transition: width 0.3s; }
-  </style>
 </head>
 <body>
-
-<h2>Approvals Injector</h2>
-<p class="subtitle">Writes approvers to all cards at once using the Power-Up SDK.</p>
-
-<label>CSV Data</label>
-<textarea id="csv" placeholder="card_id,approver1_id,approver2_id,approver3_id
-03toJvh3,68871e9d8e385696213e6a11,MEMBER_ID_2,MEMBER_ID_3"></textarea>
-<p class="hint">One card per line: card_id, approver1_id, approver2_id, approver3_id</p>
-
-<button id="runBtn" onclick="run()">▶ Run Injection</button>
-
-<div class="progress" id="progressWrap">
-  <div class="progress-fill" id="progressFill"></div>
-</div>
-<div class="log-box" id="logBox"></div>
-
 <script>
-  var t = window.TrelloPowerUp.iframe();
-
-  // Register card button so Trello loads this as a valid power-up
-  window.TrelloPowerUp.initialize({
-    'card-buttons': function(t, options) {
-      return [{
-        text: 'Approvals Injector',
-        callback: function(t) {
-          return t.popup({
-            title: 'Approvals Injector',
-            url: 'https://ahmedessam-test.github.io/trello-approvals-powerup/',
-            height: 500
-          });
-        }
-      }];
-    }
+  // Initialize as a proper power-up iframe
+  // This registers us with Trello and gets us a real t object
+  var t = window.TrelloPowerUp.iframe({
+    appKey: 'd6dfdf9018fc6b45b6e4b4e4b4e4b4e4', // your API key
+    appName: 'Approvals Injector'
   });
 
-  function log(msg, type) {
-    var box = document.getElementById('logBox');
-    box.classList.add('visible');
-    var d = document.createElement('div');
-    d.className = type || 'info';
-    d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
-    box.appendChild(d);
-    box.scrollTop = box.scrollHeight;
-  }
+  // Store t globally so the console can access it
+  window.injectorT = t;
 
-  function setProgress(done, total) {
-    document.getElementById('progressWrap').classList.add('visible');
-    document.getElementById('progressFill').style.width = Math.round((done/total)*100) + '%';
-  }
+  // Signal to the parent page that we're ready
+  window.parent.postMessage({ type: 'INJECTOR_READY', ready: true }, '*');
 
-  function parseCSV(raw) {
-    return raw.trim().split('\n')
-      .map(function(l){ return l.trim(); })
-      .filter(function(l){ return l && !l.startsWith('#') && !l.startsWith('card_id'); })
-      .map(function(l){
-        var p = l.split(',').map(function(x){ return x.trim(); });
-        return { cardId: p[0], approverIds: p.slice(1).filter(Boolean) };
-      });
-  }
-
-  function delay(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
-
-  async function run() {
-    var raw = document.getElementById('csv').value;
-    var btn = document.getElementById('runBtn');
-    var box = document.getElementById('logBox');
-    box.innerHTML = '';
-    box.classList.remove('visible');
-
-    if (!raw.trim()) { alert('Please enter CSV data.'); return; }
-    var rows = parseCSV(raw);
-    if (!rows.length) { alert('No valid rows found.'); return; }
-
-    btn.disabled = true;
-    btn.textContent = '⏳ Running...';
-
-    log('Starting — ' + rows.length + ' card(s)', 'info');
-    log('─────────────────────────────', 'info');
-
-    var ok = 0, fail = 0;
-
-    for (var i = 0; i < rows.length; i++) {
-      var row = rows[i];
-      setProgress(i, rows.length);
-
-      if (!row.cardId || !row.approverIds.length) {
-        log('Row ' + (i+1) + ': skipped — missing data', 'warn');
-        continue;
-      }
-
-      log('Card ' + row.cardId + ': writing...', 'info');
-
-      try {
-        await t.set(row.cardId, 'shared', 'approvalData', {
-          reviews: {},
-          idReviewers: row.approverIds,
-          minimumApprovals: 3
-        });
-        log('Card ' + row.cardId + ': ✓ done', 'ok');
-        ok++;
-      } catch(e) {
-        log('Card ' + row.cardId + ': ✗ ' + e.message, 'err');
-        fail++;
-      }
-
-      await delay(200);
-    }
-
-    setProgress(rows.length, rows.length);
-    log('─────────────────────────────', 'info');
-    log('Done — ' + ok + ' succeeded, ' + fail + ' failed', ok > 0 && fail === 0 ? 'ok' : 'warn');
-    btn.disabled = false;
-    btn.textContent = '▶ Run Again';
-  }
+  console.log('Injector iframe loaded, t:', typeof t);
+  console.log('t.set available:', typeof t.set);
 </script>
 </body>
 </html>

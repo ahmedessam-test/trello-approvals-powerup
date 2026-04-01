@@ -384,9 +384,10 @@
       currentMember = await t.member('id','fullName','username');
 
       // Update member chip
-      document.getElementById('memberAv').textContent = initials(currentMember.fullName);
-      document.getElementById('memberAv').style.background = avatarColor(currentMember.id);
-      document.getElementById('memberName').textContent = currentMember.fullName;
+      var avEl = document.getElementById('memberAv');
+      var nameEl = document.getElementById('memberName');
+      if (avEl) { avEl.textContent = initials(currentMember.fullName); avEl.style.background = avatarColor(currentMember.id); }
+      if (nameEl) nameEl.textContent = currentMember.fullName;
 
       var cards = await t.cards('id','name','shortLink');
       allCards = [];
@@ -411,7 +412,8 @@
   function updateStats() {
     var myCards = allCards.filter(function(c){ return getMyStatus(c) !== null; });
     var pendingMine = myCards.filter(function(c){ return getMyStatus(c)==='pending'; });
-    document.getElementById('sPending').textContent = pendingMine.length;
+    var el = document.getElementById('sPending');
+    if (el) el.textContent = pendingMine.length;
   }
 
   function setTab(tab, btn) {
@@ -543,9 +545,8 @@
       updateStats();
       renderCards();
     } catch(e) {
-      alert('Error: '+e.message);
-      btn.disabled = false;
-      btn.style.opacity = '1';
+      alert('Error: '+e.message+' | Stack: '+(e.stack||'').slice(0,200));
+      try { btn.disabled = false; btn.style.opacity = '1'; } catch(ex) {}
     }
   }
 

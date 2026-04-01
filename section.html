@@ -191,7 +191,7 @@
           '<div class="empty-sub">Set approvers to start the review process</div>'+
           '<button class="empty-btn" onclick="openSet(event)">+ Set Approvers</button>'+
         '</div>';
-      t.sizeTo('#root'); return;
+      try { t.sizeTo('#root'); } catch(e) {} return;
     }
 
     var reviews = _data.reviews || {};
@@ -264,7 +264,7 @@
         '</button>'+
       '</div>';
 
-    t.sizeTo('#root');
+    try { t.sizeTo('#root'); } catch(e) {}
   }
 
   async function doAction(memberId, status) {
@@ -282,7 +282,7 @@
   async function openSet(e) {
     await t.popup({
       title: 'Manage Approvers',
-      url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html'),
+      url: 'https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html',
       height: 420,
       mouseEvent: e
     });

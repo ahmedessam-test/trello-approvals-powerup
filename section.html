@@ -146,6 +146,12 @@
   });
 
   var COLORS = ['#0747a6','#006644','#ae2e24','#974f0c','#5e4db2','#026e8f','#206a83','#a54800'];
+
+  // Register render callback - Trello calls this when plugin data changes
+  t.render(async function() {
+    _data = await t.get('card','shared','approvalData');
+    render();
+  });
   var _data, _memberMap, _currentMember, _cardId;
 
   function initials(name) {
@@ -280,30 +286,13 @@
   }
 
   async function openSet(e) {
-    t.popup({
+    await t.popup({
       title: 'Manage Approvers',
       url: 'https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html',
       height: 420,
       mouseEvent: e
     });
-    // Poll for changes every 800ms for 20 seconds after popup opens
-    var polls = 0;
-    var lastStr = JSON.stringify(_data);
-    var poller = setInterval(async function() {
-      polls++;
-      try {
-        // Force fresh fetch by clearing cache with t.getAll approach
-        var fresh = await t.get("card","shared","approvalData");
-        var freshStr = JSON.stringify(fresh || null);
-        if (freshStr !== lastStr) {
-          lastStr = freshStr;
-          _data = fresh;
-          render();
-          clearInterval(poller);
-        }
-      } catch(e) {}
-      if (polls >= 25) clearInterval(poller);
-    }, 800);
+    await reload();
   }
 
   // Bulk injection listener

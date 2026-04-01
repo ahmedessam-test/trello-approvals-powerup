@@ -320,7 +320,7 @@
           minimumApprovals: selected.size
         });
       }
-      await t.closePopup();
+      await t.closeOverlay();
     } catch(e) {
       alert('Error: '+e.message);
       btn.disabled = false;

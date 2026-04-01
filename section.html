@@ -280,14 +280,12 @@
   }
 
   async function openSet(e) {
-    await t.overlay({
+    return t.overlay({
       url: t.signUrl('https://ahmedessam-test.github.io/trello-approvals-powerup/set-approvers.html'),
       args: {}
+    }).then(function() {
+      return reload();
     });
-    await reload();
-  }
-    // Bug 1 fix: live reload after popup closes
-    await reload();
   }
 
   // Bulk injection listener

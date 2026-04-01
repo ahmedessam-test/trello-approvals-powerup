@@ -37,94 +37,78 @@
     .header {
       background: var(--surface);
       border-bottom: 1px solid var(--border);
-      padding: 20px 24px 0;
-    }
-    .header-top {
+      padding: 20px 24px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      margin-bottom: 20px;
     }
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .header-left { display: flex; align-items: center; gap: 12px; }
     .brand-icon {
-      width: 36px;
-      height: 36px;
+      width: 40px; height: 40px;
       background: var(--blue);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 18px;
+      border-radius: 12px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px; color: #fff;
     }
-    .brand-name {
-      font-size: 18px;
-      font-weight: 800;
-      color: var(--text-strong);
-      letter-spacing: -0.02em;
-    }
-    .brand-sub { font-size: 11px; color: var(--text-muted); }
+    .brand-name { font-size: 20px; font-weight: 800; color: var(--text-strong); letter-spacing: -0.02em; }
+    .brand-sub { font-size: 12px; color: var(--text-muted); margin-top: 1px; }
 
-    /* Stats row */
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 12px;
-      margin-bottom: 20px;
-    }
-    .stat-card {
+    .header-right { display: flex; align-items: center; gap: 10px; }
+
+    .member-chip {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
       background: var(--surface2);
       border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      position: relative;
-      overflow: hidden;
+      border-radius: 20px;
+      font-size: 12px; font-weight: 600; color: var(--text-strong);
+    }
+    .member-av {
+      width: 22px; height: 22px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 9px; font-weight: 800; color: #fff;
+    }
+
+    .refresh-btn {
+      padding: 7px 14px;
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text); font-size: 12px; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      display: flex; align-items: center; gap: 5px; transition: all 0.15s;
+    }
+    .refresh-btn:hover { background: var(--border); color: var(--text-strong); }
+
+    /* ── Stats ── */
+    .stats-row {
+      display: grid; grid-template-columns: 1fr;
+      gap: 12px; padding: 20px 24px 0;
+    }
+    .stat-card {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 20px; position: relative; overflow: hidden;
     }
     .stat-card::before {
-      content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 2px;
+      content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
     }
-    .stat-card.total::before { background: var(--blue); }
     .stat-card.pending::before { background: var(--yellow); }
     .stat-card.approved::before { background: var(--green); }
-    .stat-card.declined::before { background: var(--red); }
-
-    .stat-num {
-      font-size: 28px;
-      font-weight: 800;
-      color: var(--text-strong);
-      letter-spacing: -0.03em;
-      line-height: 1;
-      margin-bottom: 4px;
-    }
-    .stat-card.total .stat-num { color: var(--blue); }
+    .stat-card.total::before { background: var(--blue); }
+    .stat-num { font-size: 32px; font-weight: 800; line-height: 1; margin-bottom: 4px; letter-spacing: -0.03em; }
     .stat-card.pending .stat-num { color: var(--yellow); }
     .stat-card.approved .stat-num { color: var(--green); }
-    .stat-card.declined .stat-num { color: var(--red); }
+    .stat-card.total .stat-num { color: var(--blue); }
     .stat-label { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em; }
 
-    /* Filter tabs */
-    .filter-tabs {
-      display: flex;
-      gap: 2px;
+    /* ── Tabs ── */
+    .tabs {
+      display: flex; gap: 2px; padding: 16px 24px 0;
+      border-bottom: 1px solid var(--border); margin: 0 0 0;
     }
     .tab {
-      padding: 10px 16px;
-      border: none;
-      background: transparent;
-      color: var(--text-muted);
-      font-size: 13px;
-      font-weight: 600;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      border-bottom: 2px solid transparent;
-      transition: all 0.15s;
-      white-space: nowrap;
+      padding: 10px 16px; border: none; background: transparent;
+      color: var(--text-muted); font-size: 13px; font-weight: 600;
+      cursor: pointer; font-family: 'DM Sans', sans-serif;
+      border-bottom: 2px solid transparent; transition: all 0.15s; white-space: nowrap;
     }
     .tab:hover { color: var(--text); }
     .tab.active { color: var(--blue); border-bottom-color: var(--blue); }
@@ -132,282 +116,172 @@
     /* ── Content ── */
     .content { padding: 20px 24px; }
 
-    /* Bulk section */
+    /* Bulk panel */
     .bulk-panel {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      margin-bottom: 20px;
-      overflow: hidden;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); margin-bottom: 20px; overflow: hidden;
     }
     .bulk-header {
-      padding: 14px 18px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      cursor: pointer;
-      user-select: none;
+      padding: 14px 18px; display: flex; align-items: center;
+      justify-content: space-between; cursor: pointer; user-select: none;
     }
     .bulk-header:hover { background: var(--surface2); }
-    .bulk-header-left {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
+    .bulk-left { display: flex; align-items: center; gap: 10px; }
     .bulk-icon {
-      width: 30px;
-      height: 30px;
-      background: var(--blue-dim);
-      border-radius: 8px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--blue);
-      font-size: 14px;
+      width: 30px; height: 30px; background: var(--blue-dim);
+      border-radius: 8px; display: flex; align-items: center; justify-content: center;
+      color: var(--blue); font-size: 14px;
     }
-    .bulk-title-text { font-size: 14px; font-weight: 700; color: var(--text-strong); }
-    .bulk-sub { font-size: 11px; color: var(--text-muted); }
-    .bulk-toggle { color: var(--text-muted); font-size: 12px; }
-
-    .bulk-body {
-      padding: 0 18px 18px;
-      display: none;
-      border-top: 1px solid var(--border);
-    }
+    .bulk-title { font-size: 14px; font-weight: 700; color: var(--text-strong); }
+    .bulk-sub-text { font-size: 11px; color: var(--text-muted); }
+    .bulk-body { padding: 0 18px 18px; display: none; border-top: 1px solid var(--border); }
     .bulk-body.open { display: block; }
-
     .bulk-hint {
-      font-size: 11px;
-      color: var(--text-muted);
-      margin: 12px 0 8px;
-      padding: 10px 12px;
-      background: var(--surface2);
-      border-radius: 6px;
+      font-size: 11px; color: var(--text-muted); margin: 12px 0 8px;
+      padding: 10px 12px; background: var(--surface2); border-radius: 6px;
       border-left: 3px solid var(--blue);
     }
-    .bulk-hint code {
-      font-family: monospace;
-      background: rgba(255,255,255,0.06);
-      padding: 1px 5px;
-      border-radius: 3px;
-      color: var(--blue);
-    }
-
+    .bulk-hint code { font-family: monospace; background: rgba(255,255,255,0.06); padding: 1px 5px; border-radius: 3px; color: var(--blue); }
     textarea {
-      width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text-strong);
-      font-family: 'DM Mono', 'Fira Code', monospace;
-      font-size: 12px;
-      padding: 10px 12px;
-      min-height: 90px;
-      resize: vertical;
-      outline: none;
-      margin-bottom: 10px;
-      transition: border-color 0.15s;
-      line-height: 1.6;
+      width: 100%; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; color: var(--text-strong); font-family: monospace;
+      font-size: 12px; padding: 10px 12px; min-height: 80px; resize: vertical;
+      outline: none; margin-bottom: 10px; transition: border-color 0.15s; line-height: 1.6;
     }
     textarea:focus { border-color: var(--blue); }
-    textarea::placeholder { color: var(--text-muted); }
-
     .bulk-actions { display: flex; gap: 8px; align-items: center; }
-
     .run-btn {
-      padding: 8px 18px;
-      background: var(--blue);
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      font-size: 13px;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'DM Sans', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: opacity 0.15s;
+      padding: 8px 18px; background: var(--blue); color: #fff; border: none;
+      border-radius: 6px; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: 'DM Sans', sans-serif; display: flex; align-items: center; gap: 6px; transition: opacity 0.15s;
     }
     .run-btn:hover { opacity: 0.85; }
     .run-btn:disabled { opacity: 0.4; cursor: not-allowed; }
-
     .progress-bar { height: 3px; background: var(--border); border-radius: 2px; flex: 1; overflow: hidden; }
     .progress-fill { height: 100%; background: var(--blue); width: 0%; transition: width 0.3s; }
-
     .bulk-log {
-      margin-top: 10px;
-      background: #0d1117;
-      border-radius: 6px;
-      padding: 12px;
-      font-family: 'Fira Code', monospace;
-      font-size: 11px;
-      line-height: 2;
-      max-height: 140px;
-      overflow-y: auto;
-      display: none;
-      border: 1px solid var(--border);
+      margin-top: 10px; background: #0d1117; border-radius: 6px; padding: 12px;
+      font-family: monospace; font-size: 11px; line-height: 2; max-height: 120px;
+      overflow-y: auto; display: none; border: 1px solid var(--border);
     }
     .bulk-log.open { display: block; }
-    .bulk-log::-webkit-scrollbar { width: 4px; }
-    .bulk-log::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
     .log-ok { color: var(--green); }
     .log-err { color: var(--red); }
     .log-info { color: var(--text-muted); }
 
-    /* ── Card list ── */
-    .section-title {
-      font-size: 11px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--text-muted);
-      margin-bottom: 12px;
+    /* Card items */
+    .section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: 0.08em; color: var(--text-muted); margin-bottom: 12px;
     }
-
     .card-grid { display: flex; flex-direction: column; gap: 8px; }
 
     .card-item {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 14px 16px;
-      cursor: pointer;
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: var(--radius); padding: 16px 18px; position: relative; overflow: hidden;
       transition: all 0.15s;
-      position: relative;
-      overflow: hidden;
     }
     .card-item::before {
-      content: '';
-      position: absolute;
-      left: 0; top: 0; bottom: 0;
-      width: 3px;
+      content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 3px;
     }
-    .card-item.status-pending::before { background: var(--yellow); }
-    .card-item.status-approved::before { background: var(--green); }
-    .card-item.status-declined::before { background: var(--red); }
-    .card-item.status-empty::before { background: var(--border); }
-
-    .card-item:hover {
-      background: var(--surface2);
-      border-color: rgba(87,157,255,0.3);
-      transform: translateX(2px);
-    }
+    .card-item.pending::before { background: var(--yellow); }
+    .card-item.approved::before { background: var(--green); }
 
     .card-top {
-      display: flex;
-      align-items: flex-start;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 10px;
+      display: flex; align-items: flex-start;
+      justify-content: space-between; gap: 12px; margin-bottom: 12px;
     }
     .card-name {
-      font-weight: 600;
-      font-size: 14px;
-      color: var(--text-strong);
-      line-height: 1.3;
-      flex: 1;
+      font-weight: 700; font-size: 14px; color: var(--text-strong);
+      line-height: 1.3; flex: 1; cursor: pointer;
     }
+    .card-name:hover { color: var(--blue); }
 
-    .status-pill {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 4px 10px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 700;
-      flex-shrink: 0;
-      letter-spacing: 0.02em;
+    .card-status {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; flex-shrink: 0;
     }
-    .pill-pending { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(245,205,71,0.2); }
-    .pill-approved { background: var(--green-dim); color: var(--green); border: 1px solid rgba(75,206,151,0.2); }
-    .pill-declined { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,104,0.2); }
-    .pill-empty { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
+    .status-pending { background: var(--yellow-dim); color: var(--yellow); border: 1px solid rgba(245,205,71,0.2); }
+    .status-approved { background: var(--green-dim); color: var(--green); border: 1px solid rgba(75,206,151,0.2); }
 
-    .approver-chips { display: flex; flex-wrap: wrap; gap: 5px; }
-    .chip {
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
-      padding: 3px 9px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 500;
+    /* All approvers progress */
+    .all-approvers {
+      display: flex; align-items: center; gap: 8px; margin-bottom: 12px; flex-wrap: wrap;
+    }
+    .approver-chip {
+      display: inline-flex; align-items: center; gap: 5px;
+      padding: 3px 9px; border-radius: 20px; font-size: 11px; font-weight: 500;
     }
     .chip-pending { background: var(--surface2); color: var(--text-muted); border: 1px solid var(--border); }
     .chip-approved { background: var(--green-dim); color: var(--green); border: 1px solid rgba(75,206,151,0.2); }
     .chip-declined { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,104,0.2); }
-
     .chip-av {
-      width: 16px;
-      height: 16px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 7px;
-      font-weight: 800;
-      color: #fff;
+      width: 16px; height: 16px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 7px; font-weight: 800; color: #fff;
     }
 
-    /* Progress bar on card */
-    .card-progress {
-      margin-top: 10px;
-      height: 3px;
-      background: var(--border);
-      border-radius: 2px;
-      overflow: hidden;
-    }
-    .card-progress-fill { height: 100%; border-radius: 2px; transition: width 0.3s; }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: var(--text-muted);
-    }
-    .empty-emoji { font-size: 36px; margin-bottom: 12px; }
-    .empty-title { font-size: 15px; font-weight: 700; color: var(--text); margin-bottom: 6px; }
-    .empty-desc { font-size: 12px; }
-
-    .loading { padding: 40px; text-align: center; color: var(--text-muted); }
-
-    /* Refresh btn */
-    .refresh-btn {
-      padding: 7px 14px;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      color: var(--text);
-      font-size: 12px;
-      font-weight: 600;
-      cursor: pointer;
+    /* Action buttons */
+    .card-actions { display: flex; gap: 8px; align-items: center; }
+    .action-btn {
+      padding: 7px 16px; border: none; border-radius: 6px;
+      font-size: 12px; font-weight: 700; cursor: pointer;
       font-family: 'DM Sans', sans-serif;
-      display: flex;
-      align-items: center;
-      gap: 5px;
-      transition: all 0.15s;
+      display: flex; align-items: center; gap: 6px; transition: opacity 0.15s;
     }
-    .refresh-btn:hover { background: var(--border); color: var(--text-strong); }
+    .action-btn:hover { opacity: 0.8; }
+    .btn-approve { background: var(--green-dim); color: var(--green); border: 1px solid rgba(75,206,151,0.3); }
+    .btn-decline { background: var(--red-dim); color: var(--red); border: 1px solid rgba(248,113,104,0.3); }
+    .btn-approved { background: var(--green); color: #fff; cursor: default; }
+    .btn-open {
+      padding: 7px 14px; background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; font-size: 12px; font-weight: 600; color: var(--text-muted);
+      cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.15s;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .btn-open:hover { color: var(--text-strong); background: var(--border); }
 
-    /* Animations */
-    @keyframes fadeUp {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
+    .progress-mini {
+      height: 3px; background: var(--border); border-radius: 2px; margin-top: 12px; overflow: hidden;
     }
+    .progress-mini-fill { height: 100%; border-radius: 2px; background: var(--yellow); transition: width 0.3s; }
+    .progress-mini-fill.full { background: var(--green); }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 60px 24px;
+    }
+    .empty-icon { font-size: 48px; margin-bottom: 16px; }
+    .empty-title { font-size: 18px; font-weight: 700; color: var(--text-strong); margin-bottom: 8px; }
+    .empty-desc { font-size: 13px; color: var(--text-muted); }
+
+    .loading { padding: 48px; text-align: center; color: var(--text-muted); }
+
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
     .card-item { animation: fadeUp 0.2s ease both; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+      display: inline-block; width: 16px; height: 16px;
+      border: 2px solid var(--border); border-top-color: var(--blue);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
+    }
   </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="header-top">
-    <div class="header-brand">
-      <div class="brand-icon">✦</div>
-      <div>
-        <div class="brand-name">Approvals</div>
-        <div class="brand-sub">Change Management Dashboard</div>
-      </div>
+  <div class="header-left">
+    <div class="brand-icon">✦</div>
+    <div>
+      <div class="brand-name">Approvals Dashboard</div>
+      <div class="brand-sub" id="boardName">Change Management</div>
+    </div>
+  </div>
+  <div class="header-right">
+    <div class="member-chip">
+      <div class="member-av" id="memberAv" style="background:#0747a6">—</div>
+      <span id="memberName">Loading…</span>
     </div>
     <button class="refresh-btn" onclick="init()">
       <svg width="12" height="12" viewBox="0 0 16 16" fill="none">
@@ -417,69 +291,56 @@
       Refresh
     </button>
   </div>
+</div>
 
-  <div class="stats-row">
-    <div class="stat-card total">
-      <div class="stat-num" id="sTotal">—</div>
-      <div class="stat-label">With Approvers</div>
-    </div>
-    <div class="stat-card pending">
-      <div class="stat-num" id="sPending">—</div>
-      <div class="stat-label">Pending</div>
-    </div>
-    <div class="stat-card approved">
-      <div class="stat-num" id="sApproved">—</div>
-      <div class="stat-label">Approved</div>
-    </div>
-    <div class="stat-card declined">
-      <div class="stat-num" id="sDeclined">—</div>
-      <div class="stat-label">Declined</div>
-    </div>
-  </div>
-
-  <div class="filter-tabs">
-    <button class="tab active" onclick="setFilter('all',this)">All Cards</button>
-    <button class="tab" onclick="setFilter('pending',this)">Pending</button>
-    <button class="tab" onclick="setFilter('approved',this)">Approved</button>
-    <button class="tab" onclick="setFilter('declined',this)">Declined</button>
-    <button class="tab" onclick="setFilter('empty',this)">No Approvers</button>
+<div class="stats-row">
+  <div class="stat-card pending">
+    <div class="stat-num" id="sPending">—</div>
+    <div class="stat-label">Pending My Approval</div>
   </div>
 </div>
 
-<div class="content">
+<div class="tabs">
+  <button class="tab active" onclick="setTab('pending', this)">⏳ Pending My Approval</button>
+  <button class="tab" onclick="setTab('bulk', this)">⚡ Bulk Set Approvers</button>
+</div>
 
-  <!-- Bulk Panel -->
-  <div class="bulk-panel">
-    <div class="bulk-header" onclick="toggleBulk()">
-      <div class="bulk-header-left">
-        <div class="bulk-icon">⚡</div>
-        <div>
-          <div class="bulk-title-text">Bulk Set Approvers</div>
-          <div class="bulk-sub">Set approvers on multiple cards at once using CSV</div>
+<div class="content">
+  <div id="bulkPanel" style="display:none">
+    <div class="bulk-panel">
+      <div class="bulk-header" onclick="toggleBulk()">
+        <div class="bulk-left">
+          <div class="bulk-icon">⚡</div>
+          <div>
+            <div class="bulk-title">Bulk Set Approvers</div>
+            <div class="bulk-sub-text">Set approvers on multiple cards at once using CSV</div>
+          </div>
         </div>
+        <span id="bulkArrow">▼</span>
       </div>
-      <span class="bulk-toggle" id="bulkArrow">▼</span>
-    </div>
-    <div class="bulk-body" id="bulkBody">
-      <div class="bulk-hint">
-        Format: <code>card_short_id, member_id_1, member_id_2, member_id_3</code> — one card per line
-      </div>
-      <textarea id="bulkCsv" placeholder="MQ9AAcak,68871e9d8e385696213e6a11,646b127449ddc15f6f1da60e,60602b17b1be5e4d747aac3b&#10;03toJvh3,68871e9d8e385696213e6a11,646b127449ddc15f6f1da60e,60602b17b1be5e4d747aac3b"></textarea>
-      <div class="bulk-actions">
-        <button class="run-btn" id="runBtn" onclick="runBulk()">
-          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l11 6-11 6V2z"/></svg>
-          Run Injection
-        </button>
-        <div class="progress-bar" id="progressBar" style="display:none">
-          <div class="progress-fill" id="progressFill"></div>
+      <div class="bulk-body open" id="bulkBody">
+        <div class="bulk-hint">
+          Format: <code>card_short_id, member_id_1, member_id_2, member_id_3</code> — one card per line
         </div>
+        <textarea id="bulkCsv" placeholder="MQ9AAcak,68871e9d8e385696213e6a11,646b127449ddc15f6f1da60e,60602b17b1be5e4d747aac3b"></textarea>
+        <div class="bulk-actions">
+          <button class="run-btn" id="runBtn" onclick="runBulk()">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l11 6-11 6V2z"/></svg>
+            Run Injection
+          </button>
+          <div class="progress-bar" id="progressBar" style="display:none">
+            <div class="progress-fill" id="progressFill"></div>
+          </div>
+        </div>
+        <div class="bulk-log" id="bulkLog"></div>
       </div>
-      <div class="bulk-log" id="bulkLog"></div>
     </div>
   </div>
 
-  <div class="section-title" id="sectionTitle">All Cards</div>
-  <div class="card-grid" id="cardGrid"><div class="loading">Loading cards…</div></div>
+  <div id="mainPanel">
+    <div class="section-label" id="sectionLabel">Pending My Approval</div>
+    <div class="card-grid" id="cardGrid"><div class="loading"><span class="spinner"></span></div></div>
+  </div>
 </div>
 
 <script>
@@ -489,87 +350,117 @@
   });
 
   var COLORS = ['#0747a6','#006644','#ae2e24','#974f0c','#5e4db2','#026e8f','#206a83','#a54800'];
-  var allCards = [], memberMap = {}, currentFilter = 'all';
+  var allCards = [], memberMap = {}, currentMember = null, currentTab = 'pending';
 
-  function initials(name) {
-    return (name||'??').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase();
-  }
-  function avatarColor(id) {
-    var h=0; for(var i=0;i<id.length;i++) h=id.charCodeAt(i)+((h<<5)-h);
-    return COLORS[Math.abs(h)%COLORS.length];
-  }
+  function initials(name) { return (name||'??').split(' ').map(function(w){return w[0];}).join('').slice(0,2).toUpperCase(); }
+  function avatarColor(id) { var h=0; for(var i=0;i<id.length;i++) h=id.charCodeAt(i)+((h<<5)-h); return COLORS[Math.abs(h)%COLORS.length]; }
   function delay(ms) { return new Promise(function(r){setTimeout(r,ms);}); }
 
-  function getStatus(item) {
-    var d = item.data;
-    if (!d || !d.idReviewers || !d.idReviewers.length) return 'empty';
-    var reviews = d.reviews || {};
-    var total = d.idReviewers.length;
-    var approved = d.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='approved'; }).length;
-    var declined = d.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='declined'; }).length;
+  function getMyStatus(item) {
+    if (!item.data || !item.data.idReviewers) return null;
+    var isAssigned = item.data.idReviewers.indexOf(currentMember.id) !== -1;
+    if (!isAssigned) return null;
+    var reviews = item.data.reviews || {};
+    var myReview = reviews[currentMember.id];
+    return myReview ? myReview.status : 'pending';
+  }
+
+  function getOverallStatus(item) {
+    if (!item.data || !item.data.idReviewers || !item.data.idReviewers.length) return 'empty';
+    var reviews = item.data.reviews || {};
+    var total = item.data.idReviewers.length;
+    var approved = item.data.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='approved'; }).length;
+    var declined = item.data.idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='declined'; }).length;
     if (declined > 0) return 'declined';
     if (approved === total) return 'approved';
     return 'pending';
   }
 
   async function init() {
-    document.getElementById('cardGrid').innerHTML = '<div class="loading">Loading cards…</div>';
+    document.getElementById('cardGrid').innerHTML = '<div class="loading"><span class="spinner"></span></div>';
     try {
       var board = await t.board('members');
       board.members.forEach(function(m){ memberMap[m.id]=m; });
+      currentMember = await t.member('id','fullName','username');
+
+      // Update member chip
+      document.getElementById('memberAv').textContent = initials(currentMember.fullName);
+      document.getElementById('memberAv').style.background = avatarColor(currentMember.id);
+      document.getElementById('memberName').textContent = currentMember.fullName;
+
       var cards = await t.cards('id','name','shortLink');
       allCards = [];
-      // Fetch plugin data for each card with small delay to avoid rate limiting
+
       for (var i=0; i<cards.length; i++) {
         try {
           var data = await t.get(cards[i].id,'shared','approvalData');
-          // t.get returns undefined if no data — treat as null
-          allCards.push({card:cards[i], data: data || null});
+          allCards.push({card:cards[i], data: data||null});
         } catch(e) {
           allCards.push({card:cards[i], data:null});
         }
-        // Small delay every 10 cards to avoid hitting limits
-        if (i > 0 && i % 10 === 0) await delay(100);
+        if (i>0 && i%10===0) await delay(50);
       }
+
       updateStats();
       renderCards();
     } catch(e) {
-      document.getElementById('cardGrid').innerHTML = '<div class="loading">Error loading: '+e.message+'</div>';
+      document.getElementById('cardGrid').innerHTML = '<div class="loading">Error: '+e.message+'</div>';
     }
   }
 
   function updateStats() {
-    var withApp = allCards.filter(function(c){ return c.data && c.data.idReviewers && c.data.idReviewers.length; });
-    document.getElementById('sTotal').textContent = withApp.length;
-    document.getElementById('sPending').textContent = withApp.filter(function(c){ return getStatus(c)==='pending'; }).length;
-    document.getElementById('sApproved').textContent = withApp.filter(function(c){ return getStatus(c)==='approved'; }).length;
-    document.getElementById('sDeclined').textContent = withApp.filter(function(c){ return getStatus(c)==='declined'; }).length;
+    var myCards = allCards.filter(function(c){ return getMyStatus(c) !== null; });
+    var pendingMine = myCards.filter(function(c){ return getMyStatus(c)==='pending'; });
+    var approvedMine = myCards.filter(function(c){ return getMyStatus(c)==='approved'; });
+    document.getElementById('sPending').textContent = pendingMine.length;
+    document.getElementById('sApproved').textContent = approvedMine.length;
+    document.getElementById('sTotal').textContent = myCards.length;
   }
 
-  function setFilter(f, btn) {
-    currentFilter = f;
+  function setTab(tab, btn) {
+    currentTab = tab;
     document.querySelectorAll('.tab').forEach(function(b){ b.classList.remove('active'); });
     btn.classList.add('active');
-    renderCards();
+
+    var bulkPanel = document.getElementById('bulkPanel');
+    var mainPanel = document.getElementById('mainPanel');
+
+    if (tab === 'bulk') {
+      bulkPanel.style.display = 'block';
+      mainPanel.style.display = 'none';
+    } else {
+      bulkPanel.style.display = 'none';
+      mainPanel.style.display = 'block';
+      renderCards();
+    }
   }
 
   function renderCards() {
-    var filtered = allCards.filter(function(item){
-      return currentFilter === 'all' || getStatus(item) === currentFilter;
-    });
+    var filtered;
+    var label;
 
-    document.getElementById('sectionTitle').textContent =
-      currentFilter === 'all' ? 'All Cards ('+filtered.length+')' :
-      currentFilter.charAt(0).toUpperCase()+currentFilter.slice(1)+' ('+filtered.length+')';
+    if (currentTab === 'pending') {
+      filtered = allCards.filter(function(c){ return getMyStatus(c)==='pending'; });
+      label = 'Pending My Approval';
+    } else if (currentTab === 'approved') {
+      filtered = allCards.filter(function(c){ return getMyStatus(c)==='approved'; });
+      label = "I've Approved";
+    } else {
+      filtered = allCards.filter(function(c){ return getMyStatus(c) !== null; });
+      label = 'All Cards Assigned to Me';
+    }
+
+    document.getElementById('sectionLabel').textContent = label + ' (' + filtered.length + ')';
 
     if (!filtered.length) {
+      var emptyMsg = currentTab === 'pending'
+        ? { icon: '✓', title: "You're all caught up!", desc: 'No cards are pending your approval.' }
+        : { icon: '○', title: 'Nothing here yet', desc: 'No cards match this filter.' };
       document.getElementById('cardGrid').innerHTML =
         '<div class="empty-state">'+
-          '<div class="empty-emoji">'+
-            (currentFilter==='approved'?'✓':currentFilter==='declined'?'✕':currentFilter==='pending'?'◎':'○')+
-          '</div>'+
-          '<div class="empty-title">No cards here</div>'+
-          '<div class="empty-desc">No cards match this filter</div>'+
+          '<div class="empty-icon">'+emptyMsg.icon+'</div>'+
+          '<div class="empty-title">'+emptyMsg.title+'</div>'+
+          '<div class="empty-desc">'+emptyMsg.desc+'</div>'+
         '</div>';
       return;
     }
@@ -578,49 +469,87 @@
     filtered.forEach(function(item, idx) {
       var card = item.card;
       var data = item.data;
-      var status = getStatus(item);
+      var myStatus = getMyStatus(item);
       var reviews = (data && data.reviews) || {};
       var idReviewers = (data && data.idReviewers) || [];
       var total = idReviewers.length;
       var approvedCount = idReviewers.filter(function(id){ return reviews[id] && reviews[id].status==='approved'; }).length;
+      var progressWidth = total > 0 ? Math.round((approvedCount/total)*100) : 0;
 
-      // Status pill
-      var pillClass = 'pill-'+status;
-      var pillIcon = status==='approved'?'✓ ':status==='declined'?'✕ ':status==='pending'?'◎ ':'';
-      var pillText = status==='approved'?'Approved':status==='declined'?'Declined':status==='pending'?'Pending ('+approvedCount+'/'+total+')':'No Approvers';
+      // All approvers chips
+      var chipsHtml = idReviewers.map(function(id){
+        var m = memberMap[id] || {fullName:'Unknown', id:id};
+        var rStatus = reviews[id] ? reviews[id].status : 'pending';
+        return '<div class="approver-chip chip-'+rStatus+'">'+
+          '<div class="chip-av" style="background:'+avatarColor(id)+'">'+initials(m.fullName)+'</div>'+
+          m.fullName+
+        '</div>';
+      }).join('');
 
-      // Approver chips
-      var chipsHtml = '';
-      if (idReviewers.length) {
-        idReviewers.forEach(function(id){
-          var m = memberMap[id] || {fullName:'Unknown',id:id};
-          var rStatus = reviews[id] ? reviews[id].status : 'pending';
-          chipsHtml += '<div class="chip chip-'+rStatus+'">'+
-            '<div class="chip-av" style="background:'+avatarColor(id)+'">'+initials(m.fullName)+'</div>'+
-            m.fullName+
-          '</div>';
-        });
+      // My action
+      var actionHtml = '';
+      if (myStatus === 'pending') {
+        actionHtml =
+          '<button class="action-btn btn-approve" onclick="doAction(\''+card.id+'\',\''+card.shortLink+'\',\'approved\',this)">'+
+            '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>'+
+            'Approve'+
+          '</button>'+
+          '<button class="action-btn btn-decline" onclick="doAction(\''+card.id+'\',\''+card.shortLink+'\',\'declined\',this)">'+
+            '<svg width="10" height="10" viewBox="0 0 12 12"><path d="M3 3l6 6M9 3l-6 6" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/></svg>'+
+            'Decline'+
+          '</button>';
+      } else if (myStatus === 'approved') {
+        actionHtml = '<button class="action-btn btn-approved" disabled>✓ Approved</button>';
       } else {
-        chipsHtml = '<span style="color:var(--text-muted);font-size:11px">No approvers assigned</span>';
+        actionHtml = '<button class="action-btn btn-decline" disabled style="opacity:0.6">✕ Declined</button>';
       }
 
-      // Progress
-      var progressWidth = total > 0 ? Math.round((approvedCount/total)*100) : 0;
-      var progressColor = status==='approved' ? 'var(--green)' : status==='declined' ? 'var(--red)' : 'var(--yellow)';
-
-      html += '<div class="card-item status-'+status+'" onclick="openCard(\''+card.shortLink+'\')" style="animation-delay:'+(idx*0.04)+'s">'+
-        '<div class="card-top">'+
-          '<div class="card-name">'+card.name+'</div>'+
-          '<span class="status-pill '+pillClass+'">'+pillIcon+pillText+'</span>'+
-        '</div>'+
-        '<div class="approver-chips">'+chipsHtml+'</div>'+
-        (total > 0 ?
-          '<div class="card-progress"><div class="card-progress-fill" style="width:'+progressWidth+'%;background:'+progressColor+'"></div></div>'
-        : '')+
-      '</div>';
+      html +=
+        '<div class="card-item '+myStatus+'" id="card-'+card.id+'" style="animation-delay:'+(idx*0.04)+'s">'+
+          '<div class="card-top">'+
+            '<div class="card-name" onclick="openCard(\''+card.shortLink+'\')">'+card.name+'</div>'+
+            '<span class="card-status status-'+myStatus+'">'+
+              (myStatus==='approved'?'✓ Approved':'⏳ Pending')+
+            '</span>'+
+          '</div>'+
+          '<div class="all-approvers">'+chipsHtml+'</div>'+
+          '<div class="card-actions">'+
+            actionHtml+
+            '<button class="btn-open" onclick="openCard(\''+card.shortLink+'\')">'+
+              '<svg width="10" height="10" viewBox="0 0 12 12" fill="none"><path d="M2 2h8M10 2v8M10 2L4 8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>'+
+              'Open Card'+
+            '</button>'+
+          '</div>'+
+          '<div class="progress-mini">'+
+            '<div class="progress-mini-fill'+(approvedCount===total?' full':'')+'" style="width:'+progressWidth+'%"></div>'+
+          '</div>'+
+        '</div>';
     });
 
     document.getElementById('cardGrid').innerHTML = html;
+  }
+
+  async function doAction(cardId, shortLink, status, btn) {
+    btn.disabled = true;
+    btn.style.opacity = '0.5';
+    try {
+      var data = await t.get(cardId,'shared','approvalData');
+      var reviews = (data && data.reviews) || {};
+      reviews[currentMember.id] = { status: status, timestamp: Date.now() };
+      data.reviews = reviews;
+      await t.set(cardId,'shared','approvalData', data);
+
+      // Update local data
+      var item = allCards.find(function(c){ return c.card.id === cardId; });
+      if (item) item.data = data;
+
+      updateStats();
+      renderCards();
+    } catch(e) {
+      alert('Error: '+e.message);
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    }
   }
 
   function openCard(shortLink) {
@@ -647,22 +576,18 @@
   async function runBulk() {
     var raw = document.getElementById('bulkCsv').value.trim();
     if (!raw) { alert('Please enter CSV data'); return; }
-
-    var rows = raw.split('\n')
-      .map(function(l){ return l.trim(); })
+    var rows = raw.split('\n').map(function(l){ return l.trim(); })
       .filter(function(l){ return l && !l.startsWith('#'); })
       .map(function(l){
         var p = l.split(',').map(function(x){ return x.trim(); });
         return { cardId: p[0], approverIds: p.slice(1).filter(Boolean) };
       });
-
-    if (!rows.length) { alert('No valid rows found'); return; }
+    if (!rows.length) { alert('No valid rows'); return; }
 
     var btn = document.getElementById('runBtn');
     var bar = document.getElementById('progressBar');
     var fill = document.getElementById('progressFill');
     btn.disabled = true;
-    btn.innerHTML = '<span style="display:inline-block;width:10px;height:10px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;margin-right:6px"></span>Running…';
     bar.style.display = 'block';
     document.getElementById('bulkLog').innerHTML = '';
 
@@ -673,10 +598,8 @@
       var row = rows[i];
       fill.style.width = Math.round((i/rows.length)*100)+'%';
       try {
-        await t.set(row.cardId, 'shared', 'approvalData', {
-          reviews: {},
-          idReviewers: row.approverIds,
-          minimumApprovals: row.approverIds.length
+        await t.set(row.cardId,'shared','approvalData',{
+          reviews:{}, idReviewers:row.approverIds, minimumApprovals:row.approverIds.length
         });
         bulkLog('✓ '+row.cardId, 'ok');
         ok++;
@@ -688,20 +611,11 @@
     }
 
     fill.style.width = '100%';
-    bulkLog('─────────────────────────────', 'info');
     bulkLog('Done — '+ok+' succeeded, '+fail+' failed', ok>0&&fail===0?'ok':'err');
-
     btn.disabled = false;
-    btn.innerHTML = '<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M3 2l11 6-11 6V2z"/></svg> Run Again';
-
     await delay(1000);
     init();
   }
-
-  // Add spin keyframe
-  var style = document.createElement('style');
-  style.textContent = '@keyframes spin{to{transform:rotate(360deg)}}';
-  document.head.appendChild(style);
 
   init();
 </script>

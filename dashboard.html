@@ -377,7 +377,7 @@
   }
 
   async function init() {
-    document.getElementById('cardGrid').innerHTML = '<div class="loading"><span class="spinner"></span></div>';
+    var cg2 = document.getElementById('cardGrid'); if(cg2) cg2.innerHTML = '<div class="loading"><span class="spinner"></span></div>';
     try {
       var board = await t.board('members');
       board.members.forEach(function(m){ memberMap[m.id]=m; });
@@ -405,7 +405,7 @@
       updateStats();
       renderCards();
     } catch(e) {
-      document.getElementById('cardGrid').innerHTML = '<div class="loading">Error: '+e.message+'</div>';
+      var cgErr = document.getElementById('cardGrid'); if(cgErr) cgErr.innerHTML = '<div class="loading">Error: '+e.message+'</div>';
     }
   }
 
@@ -449,7 +449,7 @@
       label = 'All Cards Assigned to Me';
     }
 
-    document.getElementById('sectionLabel').textContent = label + ' (' + filtered.length + ')';
+    var sl = document.getElementById('sectionLabel'); if(sl) sl.textContent = label + ' (' + filtered.length + ')';
 
     if (!filtered.length) {
       var emptyMsg = currentTab === 'pending'
@@ -525,7 +525,7 @@
         '</div>';
     });
 
-    document.getElementById('cardGrid').innerHTML = html;
+    var cg = document.getElementById('cardGrid'); if(cg) cg.innerHTML = html;
   }
 
   async function doAction(cardId, shortLink, status, btn) {
@@ -545,7 +545,7 @@
       updateStats();
       renderCards();
     } catch(e) {
-      alert('Error: '+e.message+' | Stack: '+(e.stack||'').slice(0,200));
+      alert('Error: '+e.message);
       try { btn.disabled = false; btn.style.opacity = '1'; } catch(ex) {}
     }
   }
@@ -558,7 +558,7 @@
     var body = document.getElementById('bulkBody');
     var arrow = document.getElementById('bulkArrow');
     body.classList.toggle('open');
-    arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
+    if(arrow) arrow.textContent = body.classList.contains('open') ? '▲' : '▼';
   }
 
   function bulkLog(msg, type) {
@@ -615,7 +615,7 @@
     init();
   }
 
-  init();
+  document.addEventListener("DOMContentLoaded", function() { init(); });
 </script>
 </body>
 </html>

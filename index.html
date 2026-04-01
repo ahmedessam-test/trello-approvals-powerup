@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Approvals Injector Power-Up</title>
+  <title>Approvals Injector</title>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -10,19 +10,10 @@
       font-family: 'Segoe UI', sans-serif;
       background: #1d2125;
       color: #b6c2cf;
-      padding: 20px;
-      min-height: 100vh;
+      padding: 16px;
     }
-    h2 {
-      color: #fff;
-      font-size: 16px;
-      margin-bottom: 4px;
-    }
-    .subtitle {
-      font-size: 12px;
-      color: #8c9bad;
-      margin-bottom: 20px;
-    }
+    h2 { color: #fff; font-size: 15px; margin-bottom: 4px; }
+    .subtitle { font-size: 11px; color: #8c9bad; margin-bottom: 16px; }
     label {
       display: block;
       font-size: 11px;
@@ -39,19 +30,14 @@
       border-radius: 4px;
       color: #b6c2cf;
       font-family: monospace;
-      font-size: 12px;
+      font-size: 11px;
       padding: 8px;
-      min-height: 160px;
+      min-height: 140px;
       resize: vertical;
       outline: none;
     }
     textarea:focus { border-color: #579dff; }
-    .hint {
-      font-size: 11px;
-      color: #596573;
-      margin-top: 4px;
-      margin-bottom: 16px;
-    }
+    .hint { font-size: 11px; color: #596573; margin-top: 4px; margin-bottom: 14px; }
     button {
       width: 100%;
       padding: 10px;
@@ -59,193 +45,146 @@
       color: #1d2125;
       border: none;
       border-radius: 6px;
-      font-size: 14px;
+      font-size: 13px;
       font-weight: 700;
       cursor: pointer;
     }
     button:hover { background: #85b8ff; }
     button:disabled { opacity: 0.5; cursor: not-allowed; }
     .log-box {
-      margin-top: 16px;
+      margin-top: 12px;
       background: #111417;
       border-radius: 6px;
-      padding: 12px;
+      padding: 10px;
       font-family: monospace;
-      font-size: 12px;
+      font-size: 11px;
       line-height: 1.8;
-      max-height: 260px;
+      max-height: 200px;
       overflow-y: auto;
       display: none;
     }
     .log-box.visible { display: block; }
-    .ok    { color: #4bce97; }
-    .err   { color: #f87168; }
-    .info  { color: #8c9bad; }
-    .warn  { color: #f5cd47; }
-    .progress {
-      height: 5px;
-      background: #1d2125;
-      border-radius: 3px;
-      margin-top: 10px;
-      overflow: hidden;
-      display: none;
-    }
+    .ok   { color: #4bce97; }
+    .err  { color: #f87168; }
+    .info { color: #8c9bad; }
+    .warn { color: #f5cd47; }
+    .progress { height: 4px; background: #1d2125; border-radius: 3px; margin-top: 8px; overflow: hidden; display: none; }
     .progress.visible { display: block; }
-    .progress-fill {
-      height: 100%;
-      background: #579dff;
-      width: 0%;
-      transition: width 0.3s;
-    }
+    .progress-fill { height: 100%; background: #579dff; width: 0%; transition: width 0.3s; }
   </style>
 </head>
 <body>
 
 <h2>Approvals Injector</h2>
-<p class="subtitle">Writes approval data to cards using the Power-Up SDK.</p>
+<p class="subtitle">Writes approvers to all cards at once using the Power-Up SDK.</p>
 
-<label>CSV Data (card_id, approver1_id, approver2_id, approver3_id)</label>
-<textarea id="csv" placeholder="03toJvh3,68871e9d8e385696213e6a11,MEMBER_ID_2,MEMBER_ID_3
-abc12345,MEMBER_ID_1,MEMBER_ID_2,MEMBER_ID_3"></textarea>
-<p class="hint">One card per line. Use Trello short card IDs and member IDs. Header row is ignored.</p>
+<label>CSV Data</label>
+<textarea id="csv" placeholder="card_id,approver1_id,approver2_id,approver3_id
+03toJvh3,68871e9d8e385696213e6a11,MEMBER_ID_2,MEMBER_ID_3"></textarea>
+<p class="hint">One card per line: card_id, approver1_id, approver2_id, approver3_id</p>
 
 <button id="runBtn" onclick="run()">▶ Run Injection</button>
 
 <div class="progress" id="progressWrap">
   <div class="progress-fill" id="progressFill"></div>
 </div>
-
 <div class="log-box" id="logBox"></div>
 
 <script>
-  // The plugin ID of Card Approvals by Tiny Power-Ups Club
-  const APPROVALS_PLUGIN_ID = '60e8b069fee48a45a1fe27cc';
+  var t = window.TrelloPowerUp.iframe();
 
-  var TrelloPowerUp = window.TrelloPowerUp;
-
-  // Initialize the Power-Up
-  TrelloPowerUp.initialize({
-    'board-buttons': function(t, options) {
+  // Register card button so Trello loads this as a valid power-up
+  window.TrelloPowerUp.initialize({
+    'card-buttons': function(t, options) {
       return [{
         text: 'Approvals Injector',
         callback: function(t) {
           return t.popup({
             title: 'Approvals Injector',
-            url: './index.html',
-            height: 600
+            url: 'https://ahmedessam-test.github.io/trello-approvals-powerup/',
+            height: 500
           });
         }
       }];
     }
   });
 
-  // Get t context for popup usage
-  var t = TrelloPowerUp.iframe();
-
   function log(msg, type) {
     var box = document.getElementById('logBox');
     box.classList.add('visible');
-    var line = document.createElement('div');
-    line.className = type || 'info';
-    var time = new Date().toLocaleTimeString();
-    line.textContent = '[' + time + '] ' + msg;
-    box.appendChild(line);
+    var d = document.createElement('div');
+    d.className = type || 'info';
+    d.textContent = '[' + new Date().toLocaleTimeString() + '] ' + msg;
+    box.appendChild(d);
     box.scrollTop = box.scrollHeight;
   }
 
   function setProgress(done, total) {
-    var wrap = document.getElementById('progressWrap');
-    var fill = document.getElementById('progressFill');
-    wrap.classList.add('visible');
-    fill.style.width = Math.round((done / total) * 100) + '%';
+    document.getElementById('progressWrap').classList.add('visible');
+    document.getElementById('progressFill').style.width = Math.round((done/total)*100) + '%';
   }
 
   function parseCSV(raw) {
     return raw.trim().split('\n')
-      .map(function(l) { return l.trim(); })
-      .filter(function(l) {
-        return l && !l.startsWith('#') && !l.startsWith('card_id');
-      })
-      .map(function(l) {
-        var parts = l.split(',').map(function(p) { return p.trim(); });
-        return {
-          cardId: parts[0],
-          approverIds: parts.slice(1).filter(Boolean)
-        };
+      .map(function(l){ return l.trim(); })
+      .filter(function(l){ return l && !l.startsWith('#') && !l.startsWith('card_id'); })
+      .map(function(l){
+        var p = l.split(',').map(function(x){ return x.trim(); });
+        return { cardId: p[0], approverIds: p.slice(1).filter(Boolean) };
       });
   }
 
-  function delay(ms) {
-    return new Promise(function(r) { setTimeout(r, ms); });
-  }
+  function delay(ms){ return new Promise(function(r){ setTimeout(r, ms); }); }
 
   async function run() {
-    var csvRaw = document.getElementById('csv').value;
+    var raw = document.getElementById('csv').value;
     var btn = document.getElementById('runBtn');
-    var logBox = document.getElementById('logBox');
+    var box = document.getElementById('logBox');
+    box.innerHTML = '';
+    box.classList.remove('visible');
 
-    logBox.innerHTML = '';
-    logBox.classList.remove('visible');
-
-    if (!csvRaw.trim()) {
-      alert('Please enter CSV data.');
-      return;
-    }
-
-    var rows = parseCSV(csvRaw);
-    if (rows.length === 0) {
-      alert('No valid rows found.');
-      return;
-    }
+    if (!raw.trim()) { alert('Please enter CSV data.'); return; }
+    var rows = parseCSV(raw);
+    if (!rows.length) { alert('No valid rows found.'); return; }
 
     btn.disabled = true;
     btn.textContent = '⏳ Running...';
 
-    log('Starting — ' + rows.length + ' card(s) to process', 'info');
-    log('─────────────────────────────────', 'info');
+    log('Starting — ' + rows.length + ' card(s)', 'info');
+    log('─────────────────────────────', 'info');
 
-    var success = 0;
-    var failed = 0;
+    var ok = 0, fail = 0;
 
     for (var i = 0; i < rows.length; i++) {
       var row = rows[i];
       setProgress(i, rows.length);
 
-      if (!row.cardId || row.approverIds.length === 0) {
-        log('Row ' + (i+1) + ': Skipped — missing data', 'warn');
+      if (!row.cardId || !row.approverIds.length) {
+        log('Row ' + (i+1) + ': skipped — missing data', 'warn');
         continue;
       }
 
-      log('Card ' + row.cardId + ': Writing ' + row.approverIds.length + ' approver(s)...', 'info');
+      log('Card ' + row.cardId + ': writing...', 'info');
 
       try {
-        // Use t.set() with the card ID as scope — this writes directly
-        // to the card's plugin data using the Power-Up SDK
-        var approvalData = {
-          approvalData: {
-            reviews: {},
-            idReviewers: row.approverIds,
-            minimumApprovals: 3
-          }
-        };
-
-        await t.set(row.cardId, 'shared', 'approvalData', approvalData.approvalData);
-
-        log('Card ' + row.cardId + ': ✓ Done', 'ok');
-        success++;
-      } catch(err) {
-        log('Card ' + row.cardId + ': ✗ Failed — ' + err.message, 'err');
-        failed++;
+        await t.set(row.cardId, 'shared', 'approvalData', {
+          reviews: {},
+          idReviewers: row.approverIds,
+          minimumApprovals: 3
+        });
+        log('Card ' + row.cardId + ': ✓ done', 'ok');
+        ok++;
+      } catch(e) {
+        log('Card ' + row.cardId + ': ✗ ' + e.message, 'err');
+        fail++;
       }
 
       await delay(200);
     }
 
     setProgress(rows.length, rows.length);
-    log('─────────────────────────────────', 'info');
-    log('Done — ' + success + ' succeeded, ' + failed + ' failed',
-        success > 0 && failed === 0 ? 'ok' : 'warn');
-
+    log('─────────────────────────────', 'info');
+    log('Done — ' + ok + ' succeeded, ' + fail + ' failed', ok > 0 && fail === 0 ? 'ok' : 'warn');
     btn.disabled = false;
     btn.textContent = '▶ Run Again';
   }

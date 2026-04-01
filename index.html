@@ -14,7 +14,7 @@
     'card-back-section': function(t, options) {
       return {
         title: 'Approvals',
-        icon: BASE_URL + '/icon.svg',
+        icon: BASE_URL + '/icon.png',
         content: {
           type: 'iframe',
           url: t.signUrl(BASE_URL + '/section.html'),
@@ -54,7 +54,11 @@
           }
         }
 
-        return [{ text: text, color: color, icon: BASE_URL + '/icon.svg' }];
+        var icon = BASE_URL + '/icon-pending.svg';
+        if (declinedCount > 0) icon = BASE_URL + '/icon-declined.svg';
+        else if (approvedCount === total) icon = BASE_URL + '/icon-approved.svg';
+        else if (iNeedToApprove) icon = BASE_URL + '/icon-pending.svg';
+        return [{ text: text, color: color, icon: icon }];
       }).catch(function() { return []; });
     },
 
@@ -97,7 +101,7 @@
     'board-buttons': function(t, options) {
       return [{
         text: 'Approvals Dashboard',
-        icon: BASE_URL + '/icon.svg',
+        icon: BASE_URL + '/icon.png',
         callback: function(t) {
           return t.modal({
             url: t.signUrl(BASE_URL + '/dashboard.html'),

@@ -209,11 +209,11 @@
 <div class="divider"></div>
 
 <div class="actions">
-  <button class="btn-clear" onclick="clearAll()" title="Remove all approvers">
+  <button class="btn-clear" id="clearBtn" onclick="confirmClear()">
     <svg width="12" height="12" viewBox="0 0 16 16" fill="none" style="margin-right:4px">
       <path d="M3 3l10 10M13 3L3 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
     </svg>
-    Remove All
+    <span id="clearBtnText">Remove All</span>
   </button>
   <button class="btn-save" id="saveBtn" onclick="save()">Save Approvers</button>
 </div>
@@ -298,8 +298,23 @@
     document.getElementById('warnBox').style.display = hadReviews && selected.size > 0 ? 'block' : 'none';
   }
 
+  var clearConfirming = false;
+  function confirmClear() {
+    if (!clearConfirming) {
+      clearConfirming = true;
+      document.getElementById('clearBtnText').textContent = 'Confirm?';
+      document.getElementById('clearBtn').style.background = 'rgba(248,113,104,0.3)';
+      setTimeout(function() {
+        clearConfirming = false;
+        document.getElementById('clearBtnText').textContent = 'Remove All';
+        document.getElementById('clearBtn').style.background = '';
+      }, 2500);
+      return;
+    }
+    clearAll();
+  }
+
   function clearAll() {
-    if (!confirm('Remove all approvers and reset all approvals on this card?')) return;
     selected.clear();
     filter();
     updateHint();
@@ -312,7 +327,7 @@
     btn.textContent = 'Saving…';
     try {
       if (selected.size === 0) {
-        await t.remove('card','shared','approvalData');
+        await t.set('card','shared','approvalData', null);
       } else {
         await t.set('card','shared','approvalData',{
           reviews: {},
